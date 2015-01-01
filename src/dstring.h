@@ -59,5 +59,5 @@ void update_collection( DSTRING *string, int life );
 void takeout_string( DSTRING *trash );
 
 /* checkers */
-int raw_check_bucket_for_dstring( DSTRING *bucket, DSTRING *string );
+int check_bucket_for_dstring( DSTRING *bucket, DSTRING *string );
 
