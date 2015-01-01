@@ -1,7 +1,7 @@
 /* header file for dstring.c aka Davenge String */
 /* written by Davenge */
 
-typedef struct davengine_string 	DSTRING;
+typedef struct davenge_string		DSTRING;
 typedef struct raw_davengine_string	RAW_DSTRING;
 typedef struct davenge_string **	STRING_ARRAY;
 typedef struct garbage_can		GARBAGE_CAN;
@@ -9,15 +9,14 @@ typedef struct garbage_can		GARBAGE_CAN;
 typedef long long int lint;
 #define DONT_COLLECT	-69
 
+/* global can */
 extern GARBAGE_CAN *string_garbage_can;
 
 struct garbage_can
 {
    DSTRING *collection_bucket;
-   DSTRING *no_collection_bucket
-   int collection_count;
-   int no_collection_count;
-}
+   int count;
+};
 
 struct raw_davengine_string
 {
@@ -25,7 +24,7 @@ struct raw_davengine_string
    size_t size;
    lint length;
    int reach;
-}
+};
 
 struct davenge_string
 {
@@ -37,7 +36,7 @@ struct davenge_string
    STRING_ARRAY array;
    int position;
    int a_size;
-}
+};
 
 /* constructors */
 RAW_DSTRING 	*new_raw_string		( const char *string );
@@ -57,7 +56,11 @@ void set_for_collection( DSTRING *string, int life );
 void toss_into_can( DSTRING *string );
 void update_collection( DSTRING *string, int life );
 void takeout_string( DSTRING *trash );
+void attach_string( DSTRING *string );
+void detach_string( DSTRING *string );
+void garbage_mon( void );
 
 /* checkers */
-int check_bucket_for_dstring( DSTRING *bucket, DSTRING *string );
+int check_bucket_for_dstring( DSTRING *string );
 
+/* utility */
