@@ -266,7 +266,11 @@ void update_collection( DSTRING *string, int life )
       return;
    }
    else if( life > 0 && !in_the_can )
+   {
+      string->life = life;
       toss_into_can( string );
+      return;
+   }
    string->life = life;
 }
 
