@@ -8,6 +8,9 @@ typedef struct garbage_can		GARBAGE_CAN;
 
 typedef long long int lint;
 #define DONT_COLLECT	-69
+#define DEFAULT_LIFE    10
+#define rawstr( string_ptr ) 	( (string_ptr)->raw_data->data )
+#define str( string_ptr )	( (string_ptr)->raw_data->data + (string_ptr)->cursor )
 
 /* global can */
 extern GARBAGE_CAN *string_garbage_can;
@@ -32,6 +35,7 @@ struct davenge_string
    DSTRING *next_gc;
    RAW_DSTRING *raw_data;
    int life;
+   unsigned int cursor; /* used for parsing */
    /* for arrays */
    STRING_ARRAY array;
    int position;
@@ -47,20 +51,21 @@ GARBAGE_CAN 	*setup_garbage_can	( void );
 /* deconstructors */
 void free_dstring( DSTRING *string );
 void free_raw_string( RAW_DSTRING *raw_string );
-void takeout_can( GARBAGE_CAN *can );
-
-/* setters */
-void set_for_collection( DSTRING *string, int life );
+void takeout_can( void );
 
 /* actions */
 void toss_into_can( DSTRING *string );
-void update_collection( DSTRING *string, int life );
 void takeout_string( DSTRING *trash );
 void attach_string( DSTRING *string );
 void detach_string( DSTRING *string );
-void garbage_mon( void );
 
 /* checkers */
 int check_bucket_for_dstring( DSTRING *string );
 
+/* the trash man! */
+void trash_man( void );
+void takeout_can( void ); /* clear out the damn trashcan */
+
 /* utility */
+void update_collection( DSTRING *string, int life );
+void inspect_can( void );

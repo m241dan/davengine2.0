@@ -57,6 +57,22 @@ int main(int argc, char **argv)
   dmobile_free = AllocStack();
   dmobile_list = AllocList();
 
+   /* take the garbage can out of the wrapping */
+   string_garbage_can = setup_garbage_can();
+   DSTRING *bsstring = new_string( "This is a test %s.", "and so is this" );
+   printf( "%s: first bucket = %s\r\n", __FUNCTION__, rawstr( string_garbage_can->collection_bucket ) );
+
+   DSTRING *bsstring2 = new_string_nogc( "Test Two." );
+   {
+      printf( "%s: first bucket = %s\r\n", __FUNCTION__, rawstr( string_garbage_can->collection_bucket ) );
+      DSTRING *string = new_string( "Life time test" );
+      printf( "%s: first bucket = %s\r\n", __FUNCTION__, rawstr( string_garbage_can->collection_bucket ) );
+      update_collection( string, 20 );
+   }
+
+   update_collection( bsstring, 10 );
+   update_collection( bsstring2, 20 );
+
   /* note that we are booting up */
   log_string("Program starting.");
 
@@ -93,7 +109,7 @@ int main(int argc, char **argv)
   return 0;
 }
 
-void GameLoop(int control)   
+void GameLoop(int control)
 {
   D_SOCKET *dsock;
   ITERATOR Iter;
@@ -235,6 +251,8 @@ void GameLoop(int control)
 
     /* recycle sockets */
     recycle_sockets();
+    trash_man();
+    inspect_can();
   }
 }
 
