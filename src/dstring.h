@@ -48,20 +48,6 @@ DSTRING 	*new_string		( const char *fmt, ... );
 DSTRING 	*new_string_nogc	( const char *fmt, ... );
 GARBAGE_CAN 	*setup_garbage_can	( void );
 
-/* deconstructors */
-void free_dstring( DSTRING *string );
-void free_raw_string( RAW_DSTRING *raw_string );
-void takeout_can( void );
-
-/* actions */
-void toss_into_can( DSTRING *string );
-void takeout_string( DSTRING *trash );
-void attach_string( DSTRING *string );
-void detach_string( DSTRING *string );
-
-/* checkers */
-int check_bucket_for_dstring( DSTRING *string );
-
 /* the trash man! */
 void trash_man( void );
 void takeout_can( void ); /* clear out the damn trashcan */

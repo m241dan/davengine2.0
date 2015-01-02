@@ -9,6 +9,21 @@
 #include <stdarg.h>
 #include "dstring.h"
 
+/* statics */
+/* deconstructors */
+static void free_dstring( DSTRING *string );
+static void free_raw_string( RAW_DSTRING *raw_string );
+
+/* actions */
+static void toss_into_can( DSTRING *string );
+static void takeout_string( DSTRING *trash );
+static void attach_string( DSTRING *string );
+static void detach_string( DSTRING *string );
+
+/* checkers */
+static int check_bucket_for_dstring( DSTRING *string );
+/* end statics */
+
 /* global can */
 
 GARBAGE_CAN *string_garbage_can;
@@ -129,7 +144,7 @@ GARBAGE_CAN *setup_garbage_can( void )
 }
 
 /* deconstructors */
-void free_dstring( DSTRING *string )
+static void free_dstring( DSTRING *string )
 {
    string->next_gc = NULL; /* this should be handled by the takeout_string method */
    if( string->array )
@@ -140,7 +155,7 @@ void free_dstring( DSTRING *string )
    free( string );
 }
 
-void free_raw_string( RAW_DSTRING *raw_string )
+static void free_raw_string( RAW_DSTRING *raw_string )
 {
    free( raw_string->data );
    free( raw_string );
@@ -160,7 +175,7 @@ void takeout_can( void )
 }
 
 /* actions */
-void toss_into_can( DSTRING *string )
+static void toss_into_can( DSTRING *string )
 {
    if( string->life == DONT_COLLECT ) /* don't toss something that's not collected into the can */
       return;
@@ -171,20 +186,20 @@ void toss_into_can( DSTRING *string )
    attach_string( string );
 }
 
-void takeout_string( DSTRING *trash )
+static void takeout_string( DSTRING *trash )
 {
    detach_string( trash );
    free_dstring( trash );
 }
 
-void attach_string( DSTRING *string )
+static void attach_string( DSTRING *string )
 {
    string->next_gc = string_garbage_can->collection_bucket;
    string_garbage_can->collection_bucket = string;
    string_garbage_can->count++;
 }
 
-void detach_string( DSTRING *string )
+static void detach_string( DSTRING *string )
 {
    DSTRING *bucket = string_garbage_can->collection_bucket;
    if( bucket == string )
@@ -208,7 +223,7 @@ void detach_string( DSTRING *string )
 }
 
 /* checkers */
-int check_bucket_for_dstring( DSTRING *string )
+static int check_bucket_for_dstring( DSTRING *string )
 {
    DSTRING *bucket = string_garbage_can->collection_bucket;
    while( bucket )
