@@ -288,3 +288,188 @@ void inspect_can( void )
       string = string->next_gc;
    }
 }
+
+int compare( DSTRING *compare_to, DSTRING *string )
+{
+   int len1 = length( compare_to );
+   int len2 = length( string );
+
+   if( len1 != len2 )
+      return 0;
+   if( str( compare_to ) == str( string ) )
+      return 1;
+   for( int x = 0; x < len1; x++ )
+      if( compare_to->raw_data->data[x+compare_to->cursor] != string->raw_data->data[x+string->cursor] )
+         return 0;
+   return 1;
+}
+
+int raw_compare( DSTRING *compare_to, DSTRING *string )
+{
+   int len1 = rawlength( compare_to );
+   int len2 = rawlength( string );
+
+   if( len1 != len2 )
+      return 0;
+   if( rawstr( compare_to ) == rawstr( string ) )
+      return 1;
+   for( int x = 0; x < len1; x++ )
+      if( compare_to->raw_data->data[x] != string->raw_data->data[x] )
+         return 0;
+   return 1;
+}
+
+int compare1( DSTRING *compare_to, const char *string )
+{
+   int len1 = length( compare_to );
+   int len2 = strlen( string );
+
+   if( len1 != len2 )
+      return 0;
+   if( str( compare_to ) == string )
+      return 1;
+   for( int x = 0; x < len1; x++ )
+      if( compare_to->raw_data->data[x+compare_to->cursor] != *(string+x) )
+         return 0;
+   return 1;
+}
+
+int raw_compare1( DSTRING *compare_to, const char *string )
+{
+   int len1 = rawlength( compare_to );
+   int len2 = strlen( string );
+
+   if( len1 != len2 )
+      return 0;
+   if( rawstr( compare_to ) == string )
+      return 1;
+   for( int x = 0; x < len1; x++ )
+      if( compare_to->raw_data->data[x] != *(string+x) )
+         return 0;
+   return 1;
+}
+
+int compare_nocase( DSTRING *compare_to, DSTRING *string )
+{
+   int len1 = length( compare_to );
+   int len2 = length( string );
+
+   if( len1 != len2 )
+      return 0;
+   if( str( compare_to ) == str( string ) )
+      return 1;
+   for( int x = 0; x < len1; x++ )
+      if( tolower( compare_to->raw_data->data[x+compare_to->cursor] ) != tolower( string->raw_data->data[x+string->cursor] ) )
+         return 0;
+   return 1;
+}
+
+int raw_compare_nocase( DSTRING *compare_to, DSTRING *string )
+{
+   int len1 = rawlength( compare_to );
+   int len2 = rawlength( string );
+
+   if( len1 != len2 )
+      return 0;
+   if( rawstr( compare_to ) == rawstr( string ) )
+      return 1;
+   for( int x = 0; x < len1; x++ )
+      if( tolower( compare_to->raw_data->data[x] ) != tolower( string->raw_data->data[x] ) )
+         return 0;
+   return 1;
+
+}
+
+int compare_nocase1( DSTRING *compare_to, const char *string )
+{
+   int len1 = length( compare_to );
+   int len2 = strlen( string );
+
+   if( len1 != len2 )
+      return 0;
+   if( str( compare_to ) == string )
+      return 1;
+   for( int x = 0; x < len1; x++ )
+      if( tolower( compare_to->raw_data->data[x+compare_to->cursor] ) != tolower( *(string+x) ) )
+         return 0;
+   return 1;
+
+}
+
+int raw_compare_nocase1( DSTRING *compare_to, const char *string )
+{
+   int len1 = rawlength( compare_to );
+   int len2 = strlen( string );
+
+   if( len1 != len2 )
+      return 0;
+   if( rawstr( compare_to ) == string )
+      return 1;
+   for( int x = 0; x < len1; x++ )
+      if( tolower( compare_to->raw_data->data[x] ) != tolower( *(string+x) ) )
+         return 0;
+   return 1;
+}
+
+int compare_prefix( DSTRING *compare_to, DSTRING *string )
+{
+   int len1 = length( compare_to );
+   int len2 = length( string );
+
+   if( len2 > len1 )
+      return 0;
+   if( str( compare_to ) == str( string ) )
+      return 1;
+   for( int x = 0; x < len2; x++ )
+      if( compare_to->raw_data->data[x+compare_to->cursor] != string->raw_data->data[x+string->cursor] )
+         return 0;
+   return 1;
+}
+
+int raw_compare_prefix( DSTRING *compare_to, DSTRING *string )
+{
+   int len1 = rawlength( compare_to );
+   int len2 = rawlength( string );
+
+   if( len2 > len1 )
+      return 0;
+   if( rawstr( compare_to ) == rawstr( string ) )
+      return 1;
+   for( int x = 0; x < len2; x++ )
+      if( compare_to->raw_data->data[x] != string->raw_data->data[x] )
+         return 0;
+   return 1;
+
+}
+
+int compare_prefix1( DSTRING *compare_to, const char *string )
+{
+   int len1 = length( compare_to );
+   int len2 = strlen( string );
+
+   if( len2 > len1 )
+      return 0;
+   if( str( compare_to ) == string )
+      return 1;
+   for( int x = 0; x < len2; x++ )
+      if( compare_to->raw_data->data[x+compare_to->cursor] != *(string+x) )
+         return 0;
+   return 1;
+}
+
+int raw_compare_prefix1( DSTRING *compare_to, const char *string )
+{
+   int len1 = rawlength( compare_to );
+   int len2 = strlen( string );
+
+   if( len2 > len1 )
+      return 0;
+   if( rawstr( compare_to ) == string )
+      return 1;
+   for( int x = 0; x < len2; x++ )
+      if( compare_to->raw_data->data[x] != *(string+x) )
+         return 0;
+   return 1;
+
+}
+

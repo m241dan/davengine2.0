@@ -9,8 +9,13 @@ typedef struct garbage_can		GARBAGE_CAN;
 typedef long long int lint;
 #define DONT_COLLECT	-69
 #define DEFAULT_LIFE    10
-#define rawstr( string_ptr ) 	( (string_ptr)->raw_data->data )
-#define str( string_ptr )	( (string_ptr)->raw_data->data + (string_ptr)->cursor )
+
+#define rawstr( string_ptr ) 		( (string_ptr)->raw_data->data )
+#define str( string_ptr )		( (string_ptr)->raw_data->data + (string_ptr)->cursor )
+#define rawlength( string_ptr ) 	( (string_ptr)->raw_data->length )
+#define length( string_ptr )		( (string_ptr)->raw_data->length - (string_ptr)->cursor )
+#define strsize( string_ptr )		( (string_ptr)->size )
+#define resetcursor( string_ptr )	( (string_ptr)->cursor = 0 )
 
 /* global can */
 extern GARBAGE_CAN *string_garbage_can;
@@ -49,9 +54,22 @@ DSTRING 	*new_string_nogc	( const char *fmt, ... );
 GARBAGE_CAN 	*setup_garbage_can	( void );
 
 /* the trash man! */
-void trash_man( void );
+void trash_man	( void );
 void takeout_can( void ); /* clear out the damn trashcan */
 
 /* utility */
-void update_collection( DSTRING *string, int life );
-void inspect_can( void );
+void update_collection	( DSTRING *string, int life );
+void inspect_can	( void );
+int  compare		( DSTRING *compare_to, DSTRING *string );
+int  raw_compare	( DSTRING *compare_to, DSTRING *string );
+int  compare1		( DSTRING *compare_to, const char *string );
+int  raw_compare1	( DSTRING *compare_to, const char *string );
+int  compare_nocase	( DSTRING *compare_to, DSTRING *string );
+int  raw_compare_nocase ( DSTRING *compare_to, DSTRING *string );
+int  compare_nocase1	( DSTRING *compare_to, const char *string );
+int  raw_compare_nocase1( DSTRING *compare_to, const char *string );
+int  compare_prefix	( DSTRING *compare_to, DSTRING *string );
+int  raw_compare_prefix ( DSTRING *compare_to, DSTRING *string );
+int  compare_prefix1	( DSTRING *compare_to, const char *string );
+int  raw_compare_prefix1( DSTRING *compare_to, const char *string );
+
