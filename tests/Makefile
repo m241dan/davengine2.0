@@ -6,8 +6,8 @@ all:
 	@$(CC) stringtest.c -o stringtest ../src/dstring.o
 
 stringtest:
-	rm -f stringtest
-	$(CC) stringtest.c -o stringtest ../src/dstring.o
+	@rm -f stringtest
+	@$(CC) stringtest.c -o stringtest ../src/dstring.o
 
 clean:
 	@echo Deleting tests $< ...

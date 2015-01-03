@@ -42,9 +42,9 @@ RAW_DSTRING *new_raw_string( const char *string )
 
    for( x = 0; string[x] != '\0'; x++ )
       raw_string->data[x] = string[x];
-   raw_string->data[x] = '\0';
-   raw_string->size = size;
-   raw_string->length = length;
+   raw_string->data[x] 	= '\0';
+   raw_string->size 	= size;
+   raw_string->length 	= length;
    return raw_string;
 }
 
@@ -55,10 +55,11 @@ DSTRING *new_string( const char *fmt, ... )
    va_list va;
    int length;
 
-   string = (DSTRING *)calloc( 1, sizeof( DSTRING ) );
-   string->next_gc = NULL;
-   string->position = -1;
-   string->a_size = -1;
+   string 		= (DSTRING *)calloc( 1, sizeof( DSTRING ) );
+   string->next_gc 	= NULL;
+   string->position 	= -1;
+   string->a_size 	= -1;
+   string->life		= DEFAULT_LIFE;
 
    if( !fmt || fmt[0] == '\0' )
    {
@@ -99,11 +100,11 @@ DSTRING *new_string_nogc( const char *fmt, ... )
    va_list va;
    int length;
 
-   string = (DSTRING *)calloc( 1, sizeof( DSTRING ) );
-   string->next_gc = NULL;
-   string->position = -1;
-   string->a_size = -1;
-   string->life = DONT_COLLECT;
+   string		= (DSTRING *)calloc( 1, sizeof( DSTRING ) );
+   string->next_gc 	= NULL;
+   string->position 	= -1;
+   string->a_size 	= -1;
+   string->life 	= DONT_COLLECT;
 
    if( !fmt || fmt[0] == '\0' )
    {
@@ -473,3 +474,74 @@ int raw_compare_prefix1( DSTRING *compare_to, const char *string )
 
 }
 
+DSTRING *softcopy( DSTRING *string )
+{
+   DSTRING *copy;
+
+   if( !string || !string->raw_data )
+   {
+      printf( "%s: could not make soft copy of NULL, returning a \"nil\" string.\r\n", __FUNCTION__ );
+      return new_string( NULL );
+   }
+   copy 		= (DSTRING *)calloc( 1, sizeof( DSTRING ) );
+   copy->raw_data 	= string->raw_data;
+   copy->cursor 	= string->cursor;
+   copy->raw_data->reach++;
+   update_collection( copy, DEFAULT_LIFE );
+   return copy;
+}
+
+DSTRING *softcopy_nogc( DSTRING *string )
+{
+   DSTRING *copy;
+
+   if( !string || !string->raw_data )
+   {
+      printf( "%s: could not make soft copy of NULL, returning a \"nil\" string.\r\n", __FUNCTION__ );
+      return new_string_nogc( NULL );
+   }
+   copy 		= (DSTRING *)calloc( 1, sizeof( DSTRING ) );
+   copy->raw_data       = string->raw_data;
+   copy->cursor         = string->cursor;
+   copy->raw_data->reach++;
+   update_collection( copy, DONT_COLLECT );
+   return copy;
+}
+
+DSTRING *softcopy_lit( DSTRING *string )
+{
+   DSTRING *copy;
+
+   if( !string || !string->raw_data )
+   {
+      printf( "%s: could not make soft copy of NULL, returning a \"nil\" string.\r\n", __FUNCTION__ );
+      return new_string_nogc( NULL );
+   }
+   copy 		= (DSTRING *)calloc( 1, sizeof( DSTRING ) );
+   copy->raw_data       = string->raw_data;
+   copy->cursor         = string->cursor;
+   copy->array          = string->array;
+   copy->position       = string->position;
+   copy->a_size         = string->a_size;
+   copy->raw_data->reach++;
+   update_collection( copy, string->life );
+   return copy;
+
+}
+/*
+DSTRING *hardcopy( DSTRING *string )
+{
+   DSTRING *copy;
+
+   if( !string || !string->raw_data )
+   {
+      printf( "%s: could not make soft copy of NULL, returning a \"nil\" string.\r\n", __FUNCTION__ );
+      return new_string( NULL );
+   }
+   copy = (DSTRING *)calloc( 1, sizeof( DSTRING ) );
+   copy->raw_data = (DSTRING *)calloc( 1, sizeof( RAW_DSTRING ) );
+   copy->raw_data->data = (char *)calloc( string->raw_data->size, sizeof( char ) );
+   memcpy( 
+
+}
+*/

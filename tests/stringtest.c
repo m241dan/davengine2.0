@@ -48,6 +48,16 @@ void main()
    if( raw_compare_prefix1( string1, "A str" ) )
       printf( "Test 16 succes.\r\n" );
 
+   DSTRING *soft_string = softcopy( string1 );
+   if( soft_string->raw_data == string1->raw_data )
+      printf( "Test 17 success.\r\n" );
+
+   DSTRING *soft_string_nogc = softcopy_nogc( string1 );
+   printf( "There should not be more than 4 \"A string\", in the can, if there are, the problem could be with softcopy_nogc\r\n" );
+   DSTRING *soft_string_lit = softcopy_lit( string1 );
+
+   printf( "Max Test is 17.\r\n" );
+
    while( 1 )
    {
       trash_man();

@@ -43,8 +43,8 @@ struct davenge_string
    unsigned int cursor; /* used for parsing */
    /* for arrays */
    STRING_ARRAY array;
-   int position;
-   int a_size;
+   unsigned int position;
+   unsigned int a_size;
 };
 
 /* constructors */
@@ -58,18 +58,29 @@ void trash_man	( void );
 void takeout_can( void ); /* clear out the damn trashcan */
 
 /* utility */
-void update_collection	( DSTRING *string, int life );
-void inspect_can	( void );
-int  compare		( DSTRING *compare_to, DSTRING *string );
-int  raw_compare	( DSTRING *compare_to, DSTRING *string );
-int  compare1		( DSTRING *compare_to, const char *string );
-int  raw_compare1	( DSTRING *compare_to, const char *string );
-int  compare_nocase	( DSTRING *compare_to, DSTRING *string );
-int  raw_compare_nocase ( DSTRING *compare_to, DSTRING *string );
-int  compare_nocase1	( DSTRING *compare_to, const char *string );
-int  raw_compare_nocase1( DSTRING *compare_to, const char *string );
-int  compare_prefix	( DSTRING *compare_to, DSTRING *string );
-int  raw_compare_prefix ( DSTRING *compare_to, DSTRING *string );
-int  compare_prefix1	( DSTRING *compare_to, const char *string );
-int  raw_compare_prefix1( DSTRING *compare_to, const char *string );
+void	 update_collection	( DSTRING *string, int life );
+void	 inspect_can		( void );
+int	 compare		( DSTRING *compare_to, DSTRING *string );
+int	 raw_compare		( DSTRING *compare_to, DSTRING *string );
+int	 compare1		( DSTRING *compare_to, const char *string );
+int	 raw_compare1		( DSTRING *compare_to, const char *string );
+int	 compare_nocase		( DSTRING *compare_to, DSTRING *string );
+int	 raw_compare_nocase 	( DSTRING *compare_to, DSTRING *string );
+int	 compare_nocase1	( DSTRING *compare_to, const char *string );
+int	 raw_compare_nocase1	( DSTRING *compare_to, const char *string );
+int	 compare_prefix		( DSTRING *compare_to, DSTRING *string );
+int 	 raw_compare_prefix	( DSTRING *compare_to, DSTRING *string );
+int	 compare_prefix1	( DSTRING *compare_to, const char *string );
+int	 raw_compare_prefix1	( DSTRING *compare_to, const char *string );
+DSTRING *softcopy		( DSTRING *string );
+DSTRING *softcopy_nogc		( DSTRING *string );
+DSTRING *softcopy_lit		( DSTRING *string );
 
+DSTRING *softcopy		( DSTRING *string );
+DSTRING *hardcopy		( DSTRING *string );
+DSTRING *downcase		( DSTRING *string );
+int	 downcase1		( DSTRING *string );
+DSTRING	*uppercase		( DSTRING *string );
+int	 uppercase1		( DSTRING *string );
+DSTRING *capitalize		( DSTRING *string, int range );
+int	 captailize1		( DSTRING *string, int range );

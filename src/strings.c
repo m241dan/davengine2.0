@@ -64,25 +64,6 @@ char *one_arg(char *fStr, char *bStr)
   return fStr;
 }
 
-char *capitalize(char *txt)
-{
-  static char buf[MAX_BUFFER];
-  int size, i;
-
-  buf[0] = '\0';
-
-  if (txt == NULL || txt[0] == '\0')
-    return buf;
-
-  size = strlen(txt);
-
-  for (i = 0; i < size; i++)
-    buf[i] = toupper(txt[i]);
-  buf[size] = '\0';
-
-  return buf;
-}
-
 /*  
  * Create a new buffer.
  */
