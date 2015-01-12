@@ -460,7 +460,7 @@ bool read_from_socket(D_SOCKET *dsock)
     {
       perror("Read_from_socket");
       return FALSE;
-    }     
+    }
   }
   dsock->inbuf[size] = '\0';
   return TRUE;
