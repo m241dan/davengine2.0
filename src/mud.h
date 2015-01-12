@@ -11,7 +11,6 @@
 
 #include "list.h"
 #include "stack.h"
-#include "dstring.h"
 
 /************************
  * Standard definitions *

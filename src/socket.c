@@ -57,9 +57,6 @@ int main(int argc, char **argv)
   dmobile_free = AllocStack();
   dmobile_list = AllocList();
 
-   /* take the garbage can out of the wrapping */
-   string_garbage_can = setup_garbage_can();
-
   /* note that we are booting up */
   log_string("Program starting.");
 
@@ -238,7 +235,6 @@ void GameLoop(int control)
 
     /* recycle sockets */
     recycle_sockets();
-    trash_man();
   }
 }
 
