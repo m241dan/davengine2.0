@@ -75,12 +75,11 @@ int	 raw_compare_prefix1	( DSTRING *compare_to, const char *string );
 DSTRING *softcopy		( DSTRING *string );
 DSTRING *softcopy_nogc		( DSTRING *string );
 DSTRING *softcopy_lit		( DSTRING *string );
-
-DSTRING *softcopy		( DSTRING *string );
 DSTRING *hardcopy		( DSTRING *string );
+DSTRING *hardcopy_nogc		( DSTRING *string );
 DSTRING *downcase		( DSTRING *string );
 int	 downcase1		( DSTRING *string );
 DSTRING	*uppercase		( DSTRING *string );
 int	 uppercase1		( DSTRING *string );
-DSTRING *capitalize		( DSTRING *string, int range );
-int	 captailize1		( DSTRING *string, int range );
+DSTRING *capitalize		( DSTRING *string );
+int	 capitalize1		( DSTRING *string );

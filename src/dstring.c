@@ -528,20 +528,151 @@ DSTRING *softcopy_lit( DSTRING *string )
    return copy;
 
 }
-/*
+
 DSTRING *hardcopy( DSTRING *string )
 {
    DSTRING *copy;
 
    if( !string || !string->raw_data )
    {
-      printf( "%s: could not make soft copy of NULL, returning a \"nil\" string.\r\n", __FUNCTION__ );
+      printf( "%s: could not make hard copy of NULL, returning a \"nil\" string.\r\n", __FUNCTION__ );
       return new_string( NULL );
    }
-   copy = (DSTRING *)calloc( 1, sizeof( DSTRING ) );
-   copy->raw_data = (DSTRING *)calloc( 1, sizeof( RAW_DSTRING ) );
-   copy->raw_data->data = (char *)calloc( string->raw_data->size, sizeof( char ) );
-   memcpy( 
-
+   copy 			= (DSTRING *)calloc( 1, sizeof( DSTRING ) );
+   copy->raw_data 		= (RAW_DSTRING *)calloc( 1, sizeof( RAW_DSTRING ) );
+   copy->raw_data->data 	= (char *)calloc( string->raw_data->size, sizeof( char ) );
+   copy->raw_data->size 	= string->raw_data->size;
+   copy->raw_data->length 	= string->raw_data->length;
+   copy->raw_data->reach++;
+   memcpy( copy->raw_data->data, string->raw_data->data, string->raw_data->size );
+   update_collection( copy, DEFAULT_LIFE );
+   return copy;
 }
-*/
+
+DSTRING *hardcopy_nogc( DSTRING *string )
+{
+   DSTRING *copy;
+
+   if( !string || !string->raw_data )
+   {
+      printf( "%s: could not make hard copy of NULL, returning a \"nil\" string.\r\n", __FUNCTION__ );
+      return new_string_nogc( NULL );
+   }
+   copy                         = (DSTRING *)calloc( 1, sizeof( DSTRING ) );
+   copy->raw_data               = (RAW_DSTRING *)calloc( 1, sizeof( RAW_DSTRING ) );
+   copy->raw_data->data         = (char *)calloc( string->raw_data->size, sizeof( char ) );
+   copy->raw_data->size         = string->raw_data->size;
+   copy->raw_data->length       = string->raw_data->length;
+   copy->raw_data->reach++;
+   memcpy( copy->raw_data->data, string->raw_data->data, string->raw_data->size );
+   update_collection( copy, DONT_COLLECT );
+   return copy;
+}
+
+DSTRING *downcase( DSTRING *string )
+{
+   DSTRING *downcase_string;
+
+   if( !string || !string->raw_data )
+   {
+      printf( "%s: could not downcase a NULL, returning a \"ni;\" string.\r\n", __FUNCTION__ );
+      return new_string( NULL );
+   }
+   downcase_string = hardcopy( string );
+   for( int x = 0; x < rawlength( downcase_string ); x++ )
+      downcase_string->raw_data->data[x] = tolower( downcase_string->raw_data->data[x] );
+   return downcase_string;
+}
+
+int downcase1( DSTRING *string )
+{
+   if( !string || !string->raw_data )
+   {
+      printf( "%s: passed a NULL string.\r\n", __FUNCTION__ );
+      return 0;
+   }
+   for( int x = 0; x < rawlength( string ); x++ )
+      string->raw_data->data[x] = tolower( string->raw_data->data[x] );
+   return 1;
+}
+
+DSTRING *uppercase( DSTRING *string )
+{
+   DSTRING *uppercase_string;
+   if( !string || !string->raw_data )
+   {
+      printf( "%s: passed a NULL string, returning a \"nil\".\r\n", __FUNCTION__ );
+      return new_string( NULL );
+   }
+   uppercase_string = hardcopy( string );
+   for( int x = 0; x < rawlength( uppercase_string ); x++ )
+      uppercase_string->raw_data->data[x] = toupper( uppercase_string->raw_data->data[x] );
+   return uppercase_string;
+}
+
+int uppercase1( DSTRING *string )
+{
+   if( !string || !string->raw_data )
+   {
+      printf( "%s: passed a NULL string.\r\n", __FUNCTION__ );
+      return 0;
+   }
+   for( int x = 0; x < rawlength( string ); x++ )
+      string->raw_data->data[x] = toupper( string->raw_data->data[x] );
+   return 1;
+}
+
+DSTRING *capitalize( DSTRING *string )
+{
+   DSTRING *capitalized_string;
+   int cap_next, x = 0;
+   if( !string || !string->raw_data )
+   {
+      printf( "%s: passed a NULL string, returning a \"nil\" string.\r\n", __FUNCTION__ );
+      return new_string( NULL );
+   }
+   capitalized_string = downcase( string );
+   while( isspace( rawstr( capitalized_string )[x] ) )
+      x++;
+   rawstr(capitalized_string)[x] = toupper( rawstr( capitalized_string )[x] );
+
+   for( ; x < rawlength( capitalized_string ); x++ )
+   {
+      if( isspace( rawstr( capitalized_string )[x] ) )
+         cap_next = 1;
+      else if( cap_next )
+      {
+         rawstr(capitalized_string)[x] = toupper( rawstr( capitalized_string )[x] );
+         cap_next = 0;
+      }
+      continue;
+   }
+   return capitalized_string;
+}
+
+int capitalize1( DSTRING *string )
+{
+   int cap_next, x = 0;
+   if( !string || !string->raw_data )
+   {
+      printf( "%s: passed a NULL string.\r\n", __FUNCTION__ );
+      return 0;
+   }
+   downcase1( string );
+   while( isspace( rawstr( string )[x] ) )
+      x++;
+   rawstr( string )[x] = toupper( rawstr( string )[x] );
+
+   for( x = (x+1); x < rawlength( string ); x++ )
+   {
+      if( isspace( rawstr( string )[x] ) )
+         cap_next = 1;
+      else if( cap_next )
+      {
+         rawstr( string )[x] = toupper( rawstr( string )[x] );
+         cap_next = 0;
+      }
+      continue;
+   }
+   return 1;
+}
