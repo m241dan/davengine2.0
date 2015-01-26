@@ -27,5 +27,5 @@ struct d_hash
 D_HASH 		*init_hash	( int type, int size );
 void  		 hash_add	( D_HASH *hash, void *to_add, long key );
 void  		 hash_remove	( D_HASH *hash, void *to_remove, long key );
-void 		*hash_find	( D_HASH *hash, long key );
+HASH_BUCKET	*hash_find	( D_HASH *hash, long key );
 void  		 hash_show	( D_HASH *hash );

@@ -3,6 +3,8 @@
 #include "hash.h"
 
 static inline void attach_bucket( void *to_add, long key, D_HASH *hash, long hash_key );
+static inline void detach_bucket( HASH_BUCKET *bucket, D_HASH *hash );
+static inline long get_hash_key( D_HASH *hash, long key );
 
 D_HASH *init_hash( int type, int size )
 {
@@ -43,27 +45,33 @@ void hash_add( D_HASH *hash, void *to_add, long key )
       printf( "%s: cannot add NULL data to hash.\r\n", __FUNCTION__ );
       return;
    }
-   switch( hash->type )
-   {
-      default: printf( "%s: doesn'tknow how to add to this type of hash.\r\n", __FUNCTION__ ); break;
-      case NUMERIC_HASH:
-         hash_key = key % hash->size;
-         break;
-      case ASCII_HASH:
-         hash_key = ((char *)key)[0] % hash->size;
-         break;
-   }
+   if( ( hash_key = get_hash_key( hash, key ) ) == -1 )
+      return;
    attach_bucket( to_add, key, hash, hash_key );
    return;
 }
 
 void hash_remove( D_HASH *hash, void *to_remove, long key )
 {
+   HASH_BUCKET *bucket;
 
+   if( ( bucket = hash_find( hash, key ) ) == NULL )
+      return;
+   if( bucket->data != to_remove )
+      return;
+   detach_bucket( bucket, hash );
 }
 
-void *hash_find( D_HASH *hash, long key )
+HASH_BUCKET *hash_find( D_HASH *hash, long key )
 {
+   HASH_BUCKET *bucket;
+   long hash_key;
+
+   if( ( hash_key = get_hash_key( hash, key ) ) == -1 )
+      return NULL;
+   for( bucket = hash->array[hash_key]; bucket; bucket = bucket->next )
+      if( bucket->key == key )
+         return bucket;
    return NULL;
 }
 
@@ -99,3 +107,39 @@ static inline void attach_bucket( void *to_add, long key, D_HASH *hash, long has
    hash->array[hash_key] = bucket;
 }
 
+static inline void detach_bucket( HASH_BUCKET *bucket, D_HASH *hash )
+{
+   HASH_BUCKET *search_bucket;
+   long hash_key;
+
+   if( ( hash_key = get_hash_key( hash, bucket->key ) ) == -1 )
+      return;
+   if( hash->array[hash_key] == bucket )
+      hash->array[hash_key] = bucket->next;
+   else
+      for( search_bucket = hash->array[hash_key]; search_bucket; search_bucket = search_bucket->next )
+         if( search_bucket->next == bucket )
+            search_bucket->next = bucket->next;
+
+   bucket->next = NULL;
+   bucket->data = NULL;
+   free( bucket );
+}
+
+
+static inline long get_hash_key( D_HASH *hash, long key )
+{
+   long hash_key;
+
+   switch( hash->type )
+   {
+      default: printf( "%s: doesn'tknow how to add to this type of hash.\r\n", __FUNCTION__ ); return -1;
+      case NUMERIC_HASH:
+         hash_key = key % hash->size;
+         break;
+      case ASCII_HASH:
+         hash_key = ((char *)key)[0] % hash->size;
+         break;
+   }
+   return hash_key;
+}
