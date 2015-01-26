@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include "hash.h"
 
@@ -45,7 +46,7 @@ void hash_add( D_HASH *hash, void *to_add, long key )
    switch( hash->type )
    {
       default: printf( "%s: doesn'tknow how to add to this type of hash.\r\n", __FUNCTION__ ); break;
-      case NUMBERIC_HASH:
+      case NUMERIC_HASH:
          hash_key = key % hash->size;
          break;
       case ASCII_HASH:
@@ -63,24 +64,23 @@ void hash_remove( D_HASH *hash, void *to_remove, long key )
 
 void *hash_find( D_HASH *hash, long key )
 {
-
+   return NULL;
 }
 
 void hash_show( D_HASH *hash )
 {
    HASH_BUCKET *bucket;
 
-   printf( "Hash Type: %d Size: %l\r\n", hash->type, hash->size );
-   for( int x = 0; x < size; x++ )
+   printf( "Hash Type: %d Size: %ld\r\n", hash->type, hash->size );
+   for( int x = 0; x < hash->size; x++ )
    {
       printf( " - Bucket %d - \r\n", x );
       for( bucket = hash->array[x]; bucket; bucket = bucket->next )
-      {
          switch( hash->type )
          {
             default: printf( "Invalid Hash Type.\r\n" ); break;
             case NUMERIC_HASH:
-               printf( "%s Data at Key %l\r\n", !bucket->data ? "NULL" : "GOOD", bucket->key );
+               printf( "%s Data at Key %ld\r\n", !bucket->data ? "NULL" : "GOOD", bucket->key );
                break;
             case ASCII_HASH:
                printf( "%s Data at Key %s\r\n", !bucket->data ? "NULL" : "GOOD", (char *)bucket->key );
@@ -94,8 +94,8 @@ static inline void attach_bucket( void *to_add, long key, D_HASH *hash, long has
    HASH_BUCKET *bucket = init_bucket();
    bucket->data = to_add;
    bucket->key = key;
-   if( hash[hash_key] )
-      bucket->next = hash[hash_key];
-   hash[hash_key] = bucket;
+   if( hash->array[hash_key] )
+      bucket->next = hash->array[hash_key];
+   hash->array[hash_key] = bucket;
 }
 
