@@ -59,11 +59,8 @@ int hash_remove( D_HASH *hash, void *to_remove, long key )
    if( ( bucket = hash_find( hash, key ) ) == NULL )
       return 0;
    while( bucket->data != to_remove )
-   {
-      printf( "%s looping", __FUNCTION__ );
       if( ( bucket = hash_find_next( hash, key ) ) == NULL )
          return 0;
-   }
    detach_bucket( bucket, hash );
    return 1;
 }
@@ -77,12 +74,12 @@ HASH_BUCKET *__hash_find( D_HASH *hash, long key, int reset )
    /* reset the search has for that hash_key ; go as long as its not null ; iterator ->next */
    if( reset )
       hash->hash_search[hash_key] = hash->array[hash_key];
+   else if( hash->hash_search[hash_key] ) /* to prevent accessing a NULL, if its NULL the for loop will catch it and return NULL */
+      hash->hash_search[hash_key] = hash->hash_search[hash_key]->next;
+
    for( ; hash->hash_search[hash_key]; hash->hash_search[hash_key] = hash->hash_search[hash_key]->next  )
-   {
-      printf( "__hash_find looping\n" );
       if( hash->hash_search[hash_key]->key == key )
          return hash->hash_search[hash_key];
-   }
    return NULL;
 }
 void hash_show( D_HASH *hash )
@@ -121,8 +118,6 @@ static inline void detach_bucket( HASH_BUCKET *bucket, D_HASH *hash )
 {
    HASH_BUCKET *search_bucket;
    long hash_key;
-
-   printf( "Called.\n" );
 
    if( ( hash_key = get_hash_key( hash, bucket->key ) ) == -1 )
       return;

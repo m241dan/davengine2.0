@@ -20,7 +20,6 @@
 
 /* including main header file */
 #include "mud.h"
-#include "hash.h"
 
 /* global variables */
 fd_set     fSet;                  /* the socket list for polling       */
@@ -28,7 +27,7 @@ STACK    * dsock_free   = NULL;   /* the socket free list              */
 LIST     * dsock_list   = NULL;   /* the linked list of active sockets */
 STACK    * dmobile_free = NULL;   /* the mobile free list              */
 LIST     * dmobile_list = NULL;   /* the mobile list of active mobiles */
-D_HASH   * test_hash    = NULL;
+
 /* mccp support */
 const unsigned char compress_will   [] = { IAC, WILL, TELOPT_COMPRESS,  '\0' };
 const unsigned char compress_will2  [] = { IAC, WILL, TELOPT_COMPRESS2, '\0' };
@@ -57,20 +56,6 @@ int main(int argc, char **argv)
   dsock_list = AllocList();
   dmobile_free = AllocStack();
   dmobile_list = AllocList();
-   test_hash = init_hash( NUMERIC_HASH, 21 );
-   hash_add( test_hash, dsock_free, 2 );
-   hash_add( test_hash, dsock_list, 2 );
-   hash_add( test_hash, dmobile_free, 3 );
-   hash_add( test_hash, dmobile_list, 3 );
-
-   hash_show( test_hash );
-
-   hash_remove( test_hash, dsock_free, 2 );
-   hash_remove( test_hash, dsock_list, 2 );
-   hash_remove( test_hash, dmobile_free, 3 );
-   hash_remove( test_hash, dmobile_list, 3 );
-
-   hash_show( test_hash );
 
   /* note that we are booting up */
   log_string("Program starting.");
