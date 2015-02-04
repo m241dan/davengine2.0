@@ -19,13 +19,16 @@ struct d_hash
 {
    unsigned char type;
    long int	 size;
+   HASH_BUCKET **hash_search;
    HASH_BUCKET **array;
 };
 
 #define init_bucket() (HASH_BUCKET *)calloc( 1, sizeof( HASH_BUCKET ) )
+#define hash_find( hash, key ) __hash_find( hash, key, 1 )
+#define hash_find_next( hash, key ) __hash_find( hash, key, 0 )
 
 D_HASH 		*init_hash	( int type, int size );
-void  		 hash_add	( D_HASH *hash, void *to_add, long key );
-void  		 hash_remove	( D_HASH *hash, void *to_remove, long key );
-HASH_BUCKET	*hash_find	( D_HASH *hash, long key );
+int  		 hash_add	( D_HASH *hash, void *to_add, long key );
+int  		 hash_remove	( D_HASH *hash, void *to_remove, long key );
+HASH_BUCKET	*__hash_find	( D_HASH *hash, long key, int reset );
 void  		 hash_show	( D_HASH *hash );

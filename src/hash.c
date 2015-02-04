@@ -25,56 +25,66 @@ D_HASH *init_hash( int type, int size )
          hash->type = type;
          hash->size = size;
          hash->array = (HASH_BUCKET **)calloc( size, sizeof( HASH_BUCKET * ) );
+         hash->hash_search = (HASH_BUCKET **)calloc( size, sizeof( HASH_BUCKET * ) );
          break;
    }
    return hash;
 }
 
 
-void hash_add( D_HASH *hash, void *to_add, long key )
+int hash_add( D_HASH *hash, void *to_add, long key )
 {
    long hash_key;
 
    if( !hash )
    {
       printf( "%s: cannot add to a NULL hash.\r\n", __FUNCTION__ );
-      return;
+      return 0;
    }
    if( !to_add )
    {
       printf( "%s: cannot add NULL data to hash.\r\n", __FUNCTION__ );
-      return;
+      return 0;
    }
    if( ( hash_key = get_hash_key( hash, key ) ) == -1 )
-      return;
+      return 0;
    attach_bucket( to_add, key, hash, hash_key );
-   return;
+   return 1;
 }
 
-void hash_remove( D_HASH *hash, void *to_remove, long key )
+int hash_remove( D_HASH *hash, void *to_remove, long key )
 {
    HASH_BUCKET *bucket;
 
    if( ( bucket = hash_find( hash, key ) ) == NULL )
-      return;
-   if( bucket->data != to_remove )
-      return;
+      return 0;
+   while( bucket->data != to_remove )
+   {
+      printf( "%s looping", __FUNCTION__ );
+      if( ( bucket = hash_find_next( hash, key ) ) == NULL )
+         return 0;
+   }
    detach_bucket( bucket, hash );
+   return 1;
 }
 
-HASH_BUCKET *hash_find( D_HASH *hash, long key )
+HASH_BUCKET *__hash_find( D_HASH *hash, long key, int reset )
 {
-   HASH_BUCKET *bucket;
    long hash_key;
 
    if( ( hash_key = get_hash_key( hash, key ) ) == -1 )
       return NULL;
-   for( bucket = hash->array[hash_key]; bucket; bucket = bucket->next )
-      if( bucket->key == key )
-         return bucket;
+   /* reset the search has for that hash_key ; go as long as its not null ; iterator ->next */
+   if( reset )
+      hash->hash_search[hash_key] = hash->array[hash_key];
+   for( ; hash->hash_search[hash_key]; hash->hash_search[hash_key] = hash->hash_search[hash_key]->next  )
+   {
+      printf( "__hash_find looping\n" );
+      if( hash->hash_search[hash_key]->key == key )
+         return hash->hash_search[hash_key];
+   }
    return NULL;
 }
-
 void hash_show( D_HASH *hash )
 {
    HASH_BUCKET *bucket;
@@ -111,6 +121,8 @@ static inline void detach_bucket( HASH_BUCKET *bucket, D_HASH *hash )
 {
    HASH_BUCKET *search_bucket;
    long hash_key;
+
+   printf( "Called.\n" );
 
    if( ( hash_key = get_hash_key( hash, bucket->key ) ) == -1 )
       return;
