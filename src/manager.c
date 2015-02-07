@@ -119,6 +119,58 @@ int get_zero_reach_size( void )
    return SizeOfList( memory_management->zero_reach_list );
 }
 
+MEM_BUCKET *get_bucket_for( void *ptr )
+{
+   HASH_BUCKET *h_bucket;
+   MEM_BUCKET *bucket;
+   ITERATOR Iter;
+
+   AttachIterator( &Iter, memory_management->zero_reach_list );
+   while( ( bucket = (MEM_BUCKET *)NextInList( &Iter ) ) != NULL )
+      if( bucket->memory == ptr )
+         break;
+   DetachIterator( &Iter );
+
+   /* keyes are unique memory addresses so there is no need to check the data */
+   if( !bucket )
+      if( ( h_bucket = hash_find( memory_management->reach_list, (long)ptr ) ) != NULL )
+         bucket = (MEM_BUCKET *)h_bucket->data;
+   return bucket;
+}
+
+/* utility */
+void reach_ptr( void *ptr )
+{
+   MEM_BUCKET *bucket;
+
+   if( !ptr )
+      return;
+   if( ( bucket = get_bucket_for( ptr ) ) == NULL )
+      return;
+   if( ++bucket->reach == 1 )
+   {
+      DetachFromList( bucket, memory_management->zero_reach_list );
+      hash_add( memory_management->reach_list, bucket, (long)ptr );
+   }
+   return;
+}
+
+void unreach_ptr( void *ptr )
+{
+   MEM_BUCKET *bucket;
+
+   if( !ptr )
+      return;
+   if( ( bucket = get_bucket_for( ptr ) ) == NULL )
+      return;
+   if( --bucket->reach == 0 )
+   {
+      hash_remove( memory_management->reach_list, bucket, (long)ptr );
+      AttachToList( bucket, memory_management->zero_reach_list );
+   }
+   return;
+}
+
 /* monitor */
 void clear_zero_reach( void )
 {

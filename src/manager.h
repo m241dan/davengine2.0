@@ -14,7 +14,7 @@ struct memory_bucket
 {
    void 	*memory;
    unsigned char type;
-   int		 reach;
+   unsigned int	 reach;
 };
 
 struct memory_manager
@@ -22,6 +22,19 @@ struct memory_manager
    LIST 	*zero_reach_list;
    D_HASH 	*reach_list;
 };
+
+#define assign( ptr, data )	\
+{				\
+   unreach_ptr( ptr );		\
+   ptr = data;			\
+   reach_ptr( ptr );		\
+}
+
+#define unassign( ptr )		\
+{				\
+   unreach_ptr( ptr );		\
+   ptr = NULL;			\
+}
 
 /* creators */
 int		 init_manager( void );
@@ -34,7 +47,11 @@ int 		 free_bucket( MEM_BUCKET *bucket );
 
 /* getters */
 int 		 get_zero_reach_size( void );
+MEM_BUCKET	*get_bucket_for( void *ptr );
 
+/* utility */
+void reach_ptr( void *ptr );
+void unreach_ptr( void *ptr );
 
 /* monitor */
 void 		 clear_zero_reach( void );

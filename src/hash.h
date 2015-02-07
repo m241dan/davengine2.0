@@ -31,4 +31,5 @@ D_HASH 		*init_hash	( int type, int size );
 int  		 hash_add	( D_HASH *hash, void *to_add, long key );
 int  		 hash_remove	( D_HASH *hash, void *to_remove, long key );
 HASH_BUCKET	*__hash_find	( D_HASH *hash, long key, int reset );
+int		 hash_contains	( D_HASH *hash, void *to_find, long key );
 void  		 hash_show	( D_HASH *hash );

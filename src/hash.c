@@ -82,6 +82,21 @@ HASH_BUCKET *__hash_find( D_HASH *hash, long key, int reset )
          return hash->hash_search[hash_key];
    return NULL;
 }
+
+int hash_contains( D_HASH *hash, void *to_find, long key )
+{
+   HASH_BUCKET *bucket;
+   long hash_key;
+
+   if( ( hash_key = get_hash_key( hash, key ) ) == - 1 )
+      return 0;
+
+   for( bucket = hash->array[hash_key]; bucket; bucket = bucket->next )
+      if( bucket->data == to_find )
+         return 1;
+   return 0;
+}
+
 void hash_show( D_HASH *hash )
 {
    HASH_BUCKET *bucket;
