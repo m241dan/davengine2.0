@@ -107,10 +107,10 @@ int free_bucket( MEM_BUCKET *bucket )
       case MEM_STRING:
          free( bucket->memory );
          bucket->memory = NULL;
-         free( bucket );
-         return 1;
+         break;
    }
-   return 0;
+   free( bucket );
+   return 1;
 }
 
 /* getters */
