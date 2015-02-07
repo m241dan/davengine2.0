@@ -32,5 +32,9 @@ char		*new_string( const char *fmt, ... );
 /* destroyers */
 int 		 free_bucket( MEM_BUCKET *bucket );
 
+/* getters */
+int 		 get_zero_reach_size( void );
+
+
 /* monitor */
 void 		 clear_zero_reach( void );

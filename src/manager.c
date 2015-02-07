@@ -113,6 +113,12 @@ int free_bucket( MEM_BUCKET *bucket )
    return 0;
 }
 
+/* getters */
+int get_zero_reach_size( void )
+{
+   return SizeOfList( memory_management->zero_reach_list );
+}
+
 /* monitor */
 void clear_zero_reach( void )
 {
