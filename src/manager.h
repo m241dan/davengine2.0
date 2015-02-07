@@ -30,5 +30,7 @@ int 		*new_integer( int num );
 char		*new_string( const char *fmt, ... );
 
 /* destroyers */
-void 		 free_bucket( MEM_BUCKET *bucket );
+int 		 free_bucket( MEM_BUCKET *bucket );
 
+/* monitor */
+void 		 clear_zero_reach( void );

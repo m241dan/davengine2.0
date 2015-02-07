@@ -3,8 +3,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include "list.h"
 #include "hash.h"
+#include "manager.h"
 
 
 MEM_MANAGER *memory_management = NULL;
@@ -37,7 +39,7 @@ int new_bucket( MB_TYPE type, void *memory )
    bucket->memory	= memory;
    bucket->type		= type;
    bucket->reach	= 0;
-   AttachToList( bucket, memory_management );
+   AttachToList( bucket, memory_management->zero_reach_list );
    return 1;
 }
 
@@ -82,11 +84,20 @@ char *new_string( const char *fmt, ... )
 }
 
 /* destroyers */
-void free_bucket( MEM_BUCKET *bucket )
+int free_bucket( MEM_BUCKET *bucket )
 {
    if( !bucket )
    {
-      printf( "%s: attempt to free NULL bucket.\n" );
+      printf( "%s: attempt to free NULL bucket.\n", __FUNCTION__ );
+      return 0;
+   }
+
+   DetachFromList( bucket, memory_management->zero_reach_list );
+
+   if( bucket->reach > 0 )
+   {
+      printf( "%s: will not free bucket, still in reach somewhere.\n", __FUNCTION__ );
+      /* put it into the hash */
       return 0;
    }
 
@@ -99,4 +110,17 @@ void free_bucket( MEM_BUCKET *bucket )
          free( bucket );
          return 1;
    }
+   return 0;
+}
+
+/* monitor */
+void clear_zero_reach( void )
+{
+   MEM_BUCKET *bucket;
+   ITERATOR Iter;
+
+   AttachIterator( &Iter, memory_management->zero_reach_list );
+   while( ( bucket = (MEM_BUCKET *)NextInList( &Iter ) ) != NULL )
+      free_bucket( bucket );
+   DetachIterator( &Iter );
 }

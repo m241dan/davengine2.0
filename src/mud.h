@@ -11,7 +11,7 @@
 
 #include "list.h"
 #include "stack.h"
-
+#include "hash.h"
 /************************
  * Standard definitions *
  ************************/
@@ -168,6 +168,7 @@ typedef struct buffer_type
 
 /* here we include external structure headers */
 #include "event.h"
+#include "manager.h"
 
 /******************************
  * End of new structures      *

@@ -74,6 +74,10 @@ int main(int argc, char **argv)
   if (!fCopyOver)
     control = init_socket();
 
+
+   /* init the memory manager */
+   init_manager();
+
   /* load all external data */
   load_muddata(fCopyOver);
 
@@ -193,7 +197,7 @@ void GameLoop(int control)
 
     /* call the event queue */
     heartbeat();
-
+      clear_zero_reach();
     /*
      * Here we sleep out the rest of the pulse, thus forcing
      * SocketMud(tm) to run at PULSES_PER_SECOND pulses each second.
