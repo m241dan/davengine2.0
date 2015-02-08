@@ -28,6 +28,9 @@ LIST     * dsock_list   = NULL;   /* the linked list of active sockets */
 STACK    * dmobile_free = NULL;   /* the mobile free list              */
 LIST     * dmobile_list = NULL;   /* the mobile list of active mobiles */
 
+/* api handles */
+lua_State *lua_handle 	= NULL;
+
 /* mccp support */
 const unsigned char compress_will   [] = { IAC, WILL, TELOPT_COMPRESS,  '\0' };
 const unsigned char compress_will2  [] = { IAC, WILL, TELOPT_COMPRESS2, '\0' };
@@ -57,8 +60,17 @@ int main(int argc, char **argv)
   dmobile_free = AllocStack();
   dmobile_list = AllocList();
 
-  /* note that we are booting up */
-  log_string("Program starting.");
+   /* note that we are booting up */
+   log_string("Program starting.");
+
+   log_string( "Connecting to Lua" );
+   init_lua_handle();
+
+   log_string( "Loading Lua Libraries" );
+   luaL_openlibs( lua_handle );
+
+   log_string( "Loading Lua Managed Server Settings" );
+   load_lua_server_scripts();
 
   /* initialize the event queue - part 1 */
   init_event_queue(1);
