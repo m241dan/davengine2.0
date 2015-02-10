@@ -15,6 +15,7 @@
 #include "../lua-5.3.0/src/lua.h"
 #include "../lua-5.3.0/src/lualib.h"
 #include "../lua-5.3.0/src/lauxlib.h"
+#include "socket.h"
 
 /************************
  * Standard definitions *
@@ -32,11 +33,9 @@
 #define eBOLD   1
 
 /* A few globals */
-#define PULSES_PER_SECOND     4                   /* must divide 1000 : 4, 5 or 8 works */
 #define MAX_BUFFER         1024                   /* seems like a decent amount         */
 #define MAX_OUTPUT         2048                   /* well shoot me if it isn't enough   */
 #define MAX_HELP_ENTRY     4096                   /* roughly 40 lines of blocktext      */
-#define MUDPORT            9009                   /* just set whatever port you want    */
 #define FILE_TERMINATOR    "EOF"                  /* end of file marker                 */
 #define COPYOVER_FILE      "../txt/copyover.dat"  /* tempfile to store copyover data    */
 #define EXE_FILE           "../src/SocketMud"     /* the name of the mud binary         */

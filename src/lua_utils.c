@@ -18,5 +18,19 @@ void init_lua_handle( void )
 
 void load_lua_server_scripts( void )
 {
+   int ret, top = lua_gettop( lua_handle );
 
+   if( luaL_loadfile( lua_handle, SERVER_SCRIPT ) || ( ret = lua_pcall( lua_handle, 0, 0, 0 ) ) )
+   {
+      bug( "%s: could not load server settings script.\r\n - Ret: %d - %s", __FUNCTION__, ret, lua_tostring( lua_handle, -1 ) );
+      return;
+   }
+   lua_getglobal( lua_handle, "mudport" );
+   MUD_PORT = lua_tonumber( lua_handle, -1 ) ;
+   lua_getglobal( lua_handle, "tick" );
+   PULSES_PER_SECOND = lua_tonumber( lua_handle, -1 );
+   lua_getglobal( lua_handle, "mud_name" );
+   assign( MUD_NAME, new_string( "%s", lua_tostring( lua_handle, -1 ) ) );
+
+   lua_settop( lua_handle, top );
 }

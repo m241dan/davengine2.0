@@ -48,6 +48,7 @@ void log_string(const char *txt, ...)
   fclose(fp);
 
   communicate(NULL, buf, COMM_LOG);
+  printf( "%s\n", buf );
 }
 
 /*

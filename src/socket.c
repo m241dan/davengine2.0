@@ -23,13 +23,17 @@
 
 /* global variables */
 fd_set     fSet;                  /* the socket list for polling       */
-STACK    * dsock_free   = NULL;   /* the socket free list              */
-LIST     * dsock_list   = NULL;   /* the linked list of active sockets */
-STACK    * dmobile_free = NULL;   /* the mobile free list              */
-LIST     * dmobile_list = NULL;   /* the mobile list of active mobiles */
+STACK    * dsock_free   	= NULL;   /* the socket free list              */
+LIST     * dsock_list   	= NULL;   /* the linked list of active sockets */
+STACK    * dmobile_free 	= NULL;   /* the mobile free list              */
+LIST     * dmobile_list		= NULL;   /* the mobile list of active mobiles */
+int        MUD_PORT		= 9009;
+int	   PULSES_PER_SECOND 	= 4;
+char	 * MUD_NAME		= NULL;
 
 /* api handles */
 lua_State *lua_handle 	= NULL;
+
 
 /* mccp support */
 const unsigned char compress_will   [] = { IAC, WILL, TELOPT_COMPRESS,  '\0' };
@@ -271,14 +275,14 @@ int init_socket()
   /* setting the correct values */
   my_addr.sin_family = AF_INET;
   my_addr.sin_addr.s_addr = INADDR_ANY;
-  my_addr.sin_port = htons(MUDPORT);
+  my_addr.sin_port = htons(MUD_PORT);
 
   /* this actually fixes any problems with threads */
   if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) == -1)
   {
     perror("Error in setsockopt()");
     exit(1);
-  } 
+  }
 
   /* bind the port */
   bind(sockfd, (struct sockaddr *) &my_addr, sizeof(struct sockaddr));
