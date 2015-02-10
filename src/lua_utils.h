@@ -1,3 +1,6 @@
 /* lua utilities header file written by Davenge */
 
 extern lua_State *lua_handle;
+
+void init_lua_handle( void );
+
