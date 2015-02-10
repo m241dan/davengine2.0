@@ -12,5 +12,11 @@ void init_lua_handle( void )
       bug( "Could not initialize the Lua handle." );
       exit(1);
    }
+   log_string( "Loading Lua Libs" );
    luaL_openlibs( lua_handle );
+}
+
+void load_lua_server_scripts( void )
+{
+
 }
