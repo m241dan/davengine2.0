@@ -8,6 +8,7 @@
 #include <zlib.h>
 #include <pthread.h>
 #include <arpa/telnet.h>
+#include <mysql.h>
 
 #include "list.h"
 #include "stack.h"
@@ -118,7 +119,7 @@ typedef struct  event_data    EVENT_DATA;
 struct dSocket
 {
   D_MOBILE      * player;
-  LIST          * events;
+  LLIST         * events;
   char          * hostname;
   char            inbuf[MAX_BUFFER];
   char            outbuf[MAX_OUTPUT];
@@ -136,7 +137,7 @@ struct dSocket
 struct dMobile
 {
   D_SOCKET      * socket;
-  LIST          * events;
+  LLIST         * events;
   char          * name;
   char          * password;
   sh_int          level;
@@ -173,6 +174,7 @@ typedef struct buffer_type
 #include "event.h"
 #include "manager.h"
 #include "lua_utils.h"
+#include "sqldb.h"
 
 /******************************
  * End of new structures      *
@@ -183,10 +185,10 @@ typedef struct buffer_type
  ***************************/
 
 extern  STACK       *   dsock_free;       /* the socket free list               */
-extern  LIST        *   dsock_list;       /* the linked list of active sockets  */
+extern  LLIST       *   dsock_list;       /* the linked list of active sockets  */
 extern  STACK       *   dmobile_free;     /* the mobile free list               */
-extern  LIST        *   dmobile_list;     /* the mobile list of active mobiles  */
-extern  LIST        *   help_list;        /* the linked list of help files      */
+extern  LLIST       *   dmobile_list;     /* the mobile list of active mobiles  */
+extern  LLIST       *   help_list;        /* the linked list of help files      */
 extern  const struct    typCmd tabCmd[];  /* the command table                  */
 extern  bool            shut_down;        /* used for shutdown                  */
 extern  char        *   greeting;         /* the welcome greeting               */

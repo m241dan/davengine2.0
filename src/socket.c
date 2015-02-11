@@ -23,17 +23,21 @@
 
 /* global variables */
 fd_set     fSet;                  /* the socket list for polling       */
-STACK    * dsock_free   	= NULL;   /* the socket free list              */
-LIST     * dsock_list   	= NULL;   /* the linked list of active sockets */
-STACK    * dmobile_free 	= NULL;   /* the mobile free list              */
-LIST     * dmobile_list		= NULL;   /* the mobile list of active mobiles */
-int        MUD_PORT		= 9009;
-int	   PULSES_PER_SECOND 	= 4;
-char	 * MUD_NAME		= NULL;
+STACK      *dsock_free   	= NULL;   /* the socket free list              */
+LLIST      *dsock_list   	= NULL;   /* the linked list of active sockets */
+STACK      *dmobile_free 	= NULL;   /* the mobile free list              */
+LLIST      *dmobile_list	= NULL;   /* the mobile list of active mobiles */
+int         MUD_PORT		= 9009;
+int	    PULSES_PER_SECOND 	= 4;
+char	   *MUD_NAME		= NULL;
+char 	   *DB_NAME 		= NULL;
+char 	   *DB_ADDR 		= NULL;
+char 	   *DB_LOGIN 		= NULL;
+char       *DB_PASSWORD 	= NULL;
 
 /* api handles */
 lua_State *lua_handle 	= NULL;
-
+MYSQL	  *sql_handle	= NULL;
 
 /* mccp support */
 const unsigned char compress_will   [] = { IAC, WILL, TELOPT_COMPRESS,  '\0' };
@@ -64,6 +68,9 @@ int main(int argc, char **argv)
   dmobile_free = AllocStack();
   dmobile_list = AllocList();
 
+   /* init the memory manager */
+   init_manager();
+
    /* note that we are booting up */
    log_string("Program starting.");
 
@@ -75,6 +82,9 @@ int main(int argc, char **argv)
 
    log_string( "Loading Lua Managed Server Settings" );
    load_lua_server_scripts();
+
+   log_string( "Connecting to SQL" );
+   connect_to_sql();
 
   /* initialize the event queue - part 1 */
   init_event_queue(1);
@@ -91,8 +101,6 @@ int main(int argc, char **argv)
     control = init_socket();
 
 
-   /* init the memory manager */
-   init_manager();
   /* load all external data */
   load_muddata(fCopyOver);
 

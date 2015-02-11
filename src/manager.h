@@ -19,7 +19,7 @@ struct memory_bucket
 
 struct memory_manager
 {
-   LIST 	*zero_reach_list;
+   LLIST 	*zero_reach_list;
    D_HASH 	*reach_list;
 };
 
