@@ -29,13 +29,16 @@ typedef struct Iterator
   CELL  *_pCell;
 } ITERATOR;
 
-LLIST *AllocList         ( void );
-void  AttachIterator     ( ITERATOR *pIter, LLIST *pList);
-void *NextInList         ( ITERATOR *pIter );
-void  AttachToList       ( void *pContent, LLIST *pList );
-void  DetachFromList     ( void *pContent, LLIST *pList );
-void  DetachIterator     ( ITERATOR *pIter );
-void  FreeList           ( LLIST *pList );
-int   SizeOfList         ( LLIST *pList );
+LLIST *AllocList	( void );
+void   AttachIterator	( ITERATOR *pIter, LLIST *pList);
+void   AttachIteratorEnd( ITERATOR *pIter, LLIST *pList );
+void  *NextInList	( ITERATOR *pIter );
+void  *PrevInList	( ITERATOR *pIter );
+void   AttachToList	( void *pContent, LLIST *pList );
+void   AttachToEnd	( void *pContent, LLIST *pList );
+void   DetachFromList	( void *pContent, LLIST *pList );
+void   DetachIterator	( ITERATOR *pIter );
+void   FreeList		( LLIST *pList );
+int    SizeOfList	( LLIST *pList );
 
 #endif

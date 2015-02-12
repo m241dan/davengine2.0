@@ -39,6 +39,19 @@ void AttachIterator(ITERATOR *pIter, LLIST *pList)
     pIter->_pCell = NULL;
 }
 
+void AttachIteratorEnd( ITERATOR *pIter, LLIST *pList )
+{
+   pIter->_pList = pList;
+
+   if( pList != NULL )
+   {
+      pList->_iterators++;
+      pIter->_pCell = pList->_pFirstCell;
+   }
+   else
+      pIter->_pCell = NULL;
+}
+
 CELL *AllocCell()
 {
   CELL *pCell;
@@ -85,6 +98,32 @@ void AttachToList(void *pContent, LLIST *pList)
   pList->_pFirstCell = pCell;
 
   pList->_size++;
+}
+
+void AttachToEnd( void *pContent, LLIST *pList )
+{
+   CELL *pCell;
+
+   for( pCell = pList->_pLastCell; pCell != NULL; pCell = pCell->_pPrevCell )
+   {
+      if( !pCell->_valid )
+         continue;
+
+      if( pCell->_pContent == pContent )
+         return;
+   }
+
+   pCell = AllocCell();
+   pCell->_pContent = pContent;
+   pCell->_pNextCell = pList->_pFirstCell;
+
+   if( pList->_pLastCell != NULL )
+      pList->_pLastCell->_pNextCell = pCell;
+   if( pList->_pFirstCell == NULL )
+      pList->_pFirstCell = pCell;
+
+   pList->_pLastCell = pCell;
+   pList->_size++;
 }
 
 void DetachFromList(void *pContent, LLIST *pList)
@@ -192,6 +231,21 @@ void *NextInList(ITERATOR *pIter)
   }
 
   return pContent;
+}
+
+void *PrevInList( ITERATOR *pIter )
+{
+   void *pContent = NULL;
+
+   while( pIter->_pCell != NULL && !pIter->_pCell->_valid )
+      pIter->_pCell = pIter->_pCell->_pPrevCell;
+
+   if( pIter->_pCell != NULL )
+   {
+      pContent = pIter->_pCell->_pContent;
+      pIter->_pCell = pIter->_pCell->_pPrevCell;
+   }
+   return pContent;
 }
 
 int SizeOfList(LLIST *pList)
