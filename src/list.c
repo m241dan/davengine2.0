@@ -126,6 +126,83 @@ void AttachToEnd( void *pContent, LLIST *pList )
    pList->_size++;
 }
 
+void InsertBefore( void *pContent, LLIST *pList, void *bContent )
+{
+   CELL *pCell, *bCell;
+
+   for( pCell = pList->_pFirstCell; pCell; pCell = pCell->_pNextCell )
+   {
+      if( !pCell->_valid )
+         continue;
+
+      if( pCell->_pContent == pContent )
+         return;
+   }
+
+   for( bCell = pList->_pFirstCell; bCell; bCell = bCell->_pNextCell )
+   {
+      if( !bCell->_valid )
+         continue;
+      if( bCell->_pContent == bContent )
+         break;
+   }
+
+   if( !bCell )
+      return;
+
+   pCell = AllocCell();
+   pCell->_pContent = pContent;
+   pCell->_pNextCell = bCell;
+   if( bCell->_pPrevCell )
+   {
+      pCell->_pPrevCell = bCell->_pPrevCell;
+      pCell->_pPrevCell->_pNextCell = pCell;
+   }
+   else if( bCell == pList->_pFirstCell )
+      pList->_pFirstCell = pCell;
+
+   bCell->_pPrevCell = pCell;
+   pList->_size++;
+}
+
+void InsertAfter( void *pContent, LLIST *pList, void *aContent )
+{
+   CELL *pCell, *aCell;
+
+   for( pCell = pList->_pFirstCell; pCell; pCell = pCell->_pNextCell )
+   {
+      if( !pCell->_valid )
+         continue;
+      if( pCell->_pContent == pContent )
+         return;
+   }
+
+   for( aCell = pList->_pFirstCell; aCell; aCell = aCell->_pNextCell )
+   {
+      if( !aCell->_valid )
+         continue;
+      if( aCell->_pContent == aContent )
+         break;
+   }
+
+   if( !aCell )
+      return;
+
+   pCell = AllocCell();
+   pCell->_pContent = pContent;
+   pCell->_pPrevCell = aCell;
+   if( aCell->_pNextCell )
+   {
+      pCell->_pNextCell = aCell->_pNextCell;
+      pCell->_pNextCell->_pPrevCell = pCell;
+   }
+   else if( aCell == pList->_pLastCell )
+      pList->_pLastCell = pCell;
+
+   aCell->_pNextCell = pCell;
+   pList->_size++;
+}
+
 void DetachFromList(void *pContent, LLIST *pList)
 {
   CELL *pCell;

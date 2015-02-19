@@ -36,6 +36,8 @@ void  *NextInList	( ITERATOR *pIter );
 void  *PrevInList	( ITERATOR *pIter );
 void   AttachToList	( void *pContent, LLIST *pList );
 void   AttachToEnd	( void *pContent, LLIST *pList );
+void   InsertBefore	( void *pContent, LLIST *pList, void *bContent );
+void   InsertAfter	( void *pContent, LLIST *pList, void *aContent );
 void   DetachFromList	( void *pContent, LLIST *pList );
 void   DetachIterator	( ITERATOR *pIter );
 void   FreeList		( LLIST *pList );
