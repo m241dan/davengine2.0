@@ -13,10 +13,10 @@
 #include "list.h"
 #include "stack.h"
 #include "hash.h"
+#include "buffers.h"
 #include "../lua-5.3.0/src/lua.h"
 #include "../lua-5.3.0/src/lualib.h"
 #include "../lua-5.3.0/src/lauxlib.h"
-#include "socket.h"
 
 /************************
  * Standard definitions *
@@ -171,8 +171,9 @@ typedef struct buffer_type
 } BUFFER;
 
 /* here we include external structure headers */
-#include "event.h"
 #include "manager.h"
+#include "socket.h"
+#include "event.h"
 #include "lua_utils.h"
 #include "sqldb.h"
 
@@ -269,11 +270,6 @@ char   *one_arg               ( char *fStr, char *bStr );
 char   *strdup                ( const char *s );
 int     strcasecmp            ( const char *s1, const char *s2 );
 bool    is_prefix             ( const char *aStr, const char *bStr );
-BUFFER *__buffer_new          ( int size );
-void    __buffer_strcat       ( BUFFER *buffer, const char *text );
-void    buffer_free           ( BUFFER *buffer );
-void    buffer_clear          ( BUFFER *buffer );
-int     bprintf               ( BUFFER *buffer, char *fmt, ... );
 
 /*
  * help.c
@@ -292,20 +288,6 @@ void  load_muddata            ( bool fCopyOver );
 char *get_time                ( void );
 void  copyover_recover        ( void );
 D_M  *check_reconnect         ( char *player );
-
-/*
- * action_safe.c
- */
-void  cmd_say                 ( D_M *dMob, char *arg );
-void  cmd_quit                ( D_M *dMob, char *arg );
-void  cmd_shutdown            ( D_M *dMob, char *arg );
-void  cmd_commands            ( D_M *dMob, char *arg );
-void  cmd_who                 ( D_M *dMob, char *arg );
-void  cmd_help                ( D_M *dMob, char *arg );
-void  cmd_compress            ( D_M *dMob, char *arg );
-void  cmd_save                ( D_M *dMob, char *arg );
-void  cmd_copyover            ( D_M *dMob, char *arg );
-void  cmd_linkdead            ( D_M *dMob, char *arg );
 
 /*
  * mccp.c

@@ -7,7 +7,7 @@ typedef struct memory_manager MEM_MANAGER;
 
 typedef enum
 {
-   MEM_INTEGER, MEM_STRING, MAX_MEM
+   MEM_INTEGER, MEM_STRING, MEM_BUFFER, MAX_MEM
 } MB_TYPE;
 
 struct memory_bucket
@@ -37,21 +37,23 @@ struct memory_manager
 }
 
 /* creators */
-int		 init_manager( void );
-int		 new_bucket( MB_TYPE type, void *memory );
-int 		*new_integer( int num );
-char		*new_string( const char *fmt, ... );
+int		 init_manager		( void );
+int		 new_bucket		( MB_TYPE type, void *memory );
+int 		*new_integer		( int num );
+char		*new_string		( const char *fmt, ... );
+D_BUFFER	*new_buffer		( int width );
 
 /* destroyers */
-int 		 free_bucket( MEM_BUCKET *bucket );
+int 		 free_bucket		( MEM_BUCKET *bucket );
+int		 free_buffer		( D_BUFFER *buf );
 
 /* getters */
-int 		 get_zero_reach_size( void );
-MEM_BUCKET	*get_bucket_for( void *ptr );
+int 		 get_zero_reach_size	( void );
+MEM_BUCKET	*get_bucket_for		( void *ptr );
 
 /* utility */
-void reach_ptr( void *ptr );
-void unreach_ptr( void *ptr );
+void 		 reach_ptr		( void *ptr );
+void 		 unreach_ptr		( void *ptr );
 
 /* monitor */
-void 		 clear_zero_reach( void );
+void 		 clear_zero_reach	( void );

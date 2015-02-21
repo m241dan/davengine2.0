@@ -5,7 +5,10 @@
 
 #include <stdlib.h>
 
+#include "hash.h"
 #include "list.h"
+#include "buffers.h"
+#include "manager.h"
 
 /* local procedures */
 void  FreeCell        ( CELL *pCell, LLIST *pList );
@@ -87,7 +90,7 @@ void AttachToList(void *pContent, LLIST *pList)
     return;
 
   pCell = AllocCell();
-  pCell->_pContent = pContent;
+  assign( pCell->_pContent,  pContent );
   pCell->_pNextCell = pList->_pFirstCell;
 
   if (pList->_pFirstCell != NULL)
@@ -114,7 +117,7 @@ void AttachToEnd( void *pContent, LLIST *pList )
    }
 
    pCell = AllocCell();
-   pCell->_pContent = pContent;
+   assign( pCell->_pContent, pContent );
    pCell->_pNextCell = pList->_pFirstCell;
 
    if( pList->_pLastCell != NULL )
@@ -151,7 +154,7 @@ void InsertBefore( void *pContent, LLIST *pList, void *bContent )
       return;
 
    pCell = AllocCell();
-   pCell->_pContent = pContent;
+   assign( pCell->_pContent, pContent );
    pCell->_pNextCell = bCell;
    if( bCell->_pPrevCell )
    {
@@ -189,7 +192,7 @@ void InsertAfter( void *pContent, LLIST *pList, void *aContent )
       return;
 
    pCell = AllocCell();
-   pCell->_pContent = pContent;
+   assign( pCell->_pContent, pContent );
    pCell->_pPrevCell = aCell;
    if( aCell->_pNextCell )
    {
@@ -280,10 +283,11 @@ void FreeCell(CELL *pCell, LLIST *pList)
   if (pCell->_pPrevCell != NULL)
     pCell->_pPrevCell->_pNextCell = pCell->_pNextCell;
 
-  if (pCell->_pNextCell != NULL) 
+  if (pCell->_pNextCell != NULL)
     pCell->_pNextCell->_pPrevCell = pCell->_pPrevCell;
 
-  free(pCell);
+   unassign( pCell->_pContent );
+   free(pCell);
 }
 
 void InvalidateCell(CELL *pCell)

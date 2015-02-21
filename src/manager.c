@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+
 #include "list.h"
+#include "buffers.h"
 #include "hash.h"
 #include "manager.h"
 
@@ -83,6 +85,17 @@ char *new_string( const char *fmt, ... )
    return ptr;
 }
 
+D_BUFFER *new_buffer( int width )
+{
+   D_BUFFER *buf = malloc( sizeof( D_BUFFER ) );
+   buf->width = width;
+   buf->favor = BOT_FAVOR;
+   buf->lines = AllocList();
+
+   new_bucket( MEM_BUFFER, buf );
+   return buf;
+}
+
 /* destroyers */
 int free_bucket( MEM_BUCKET *bucket )
 {
@@ -108,9 +121,20 @@ int free_bucket( MEM_BUCKET *bucket )
          free( bucket->memory );
          bucket->memory = NULL;
          break;
+      case MEM_BUFFER:
+         free_buffer( (D_BUFFER *)bucket->memory );
+         bucket->memory = NULL;
+         break;
    }
    free( bucket );
    return 1;
+}
+
+int free_buffer( D_BUFFER *buf )
+{
+   FreeList( buf->lines );
+   free( buf );
+   return 0;
 }
 
 /* getters */
