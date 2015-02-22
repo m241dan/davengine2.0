@@ -80,7 +80,7 @@ char *new_string( const char *fmt, ... )
    free( ptr );
 
    /* plus 1 for NULL terminator */
-   size = ( length * 2 ) + 1;
+   size = length + 101;
 
    ptr = malloc( sizeof( char ) * ( length + 1 ) );
    va_start( va, fmt );
