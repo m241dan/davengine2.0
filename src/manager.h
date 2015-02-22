@@ -13,6 +13,7 @@ typedef enum
 struct memory_bucket
 {
    void 	*memory;
+   size_t	 mem_size;
    unsigned char type;
    unsigned int	 reach;
 };
@@ -38,9 +39,10 @@ struct memory_manager
 
 /* creators */
 int		 init_manager		( void );
-int		 new_bucket		( MB_TYPE type, void *memory );
+int		 new_bucket		( MB_TYPE type, void *memory, size_t size );
 int 		*new_integer		( int num );
 char		*new_string		( const char *fmt, ... );
+char		*str_alloc		( size_t size );
 D_BUFFER	*new_buffer		( int width );
 
 /* destroyers */
@@ -49,11 +51,12 @@ int		 free_buffer		( D_BUFFER *buf );
 
 /* getters */
 int 		 get_zero_reach_size	( void );
-MEM_BUCKET	*get_bucket_for		( void *ptr );
+MEM_BUCKET	*get_bucket_for		( const void *ptr );
+size_t		 get_size		( const void *ptr );
 
 /* utility */
-void 		 reach_ptr		( void *ptr );
-void 		 unreach_ptr		( void *ptr );
+void 		 reach_ptr		( const void *ptr );
+void 		 unreach_ptr		( const void *ptr );
 
 /* monitor */
 void 		 clear_zero_reach	( void );

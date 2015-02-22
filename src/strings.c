@@ -102,3 +102,39 @@ int strcasecmp(const char *s1, const char *s2)
   /* s2 is less than s1 */
   return 1;
 }
+
+char *smash_color( const char *str )
+{
+   char *new_str, *ptr;
+
+   if( !str )
+      return NULL;
+
+   new_str = str_alloc( get_size( str ) );
+   ptr = new_str;
+
+   for( ; *str != '\0'; str++ )
+   {
+      if( *str == '#' && *(str+1) != '\0' && *(str+1) != '#' )
+         str++;
+      else if( *(str+1) == '#' )
+         continue;
+      else
+         *ptr++ = *str;
+   }
+   *ptr = '\0';
+   return new_str;
+}
+
+int color_count( const char *str )
+{
+   int count = 0;
+   if( !str )
+      return 0;
+
+   for( ; *str != '\0'; str++ )
+      if( *str == '#' && *(str+1) != '#' )
+         count++;
+
+   return count;
+}

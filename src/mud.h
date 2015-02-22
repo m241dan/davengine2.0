@@ -270,6 +270,8 @@ char   *one_arg               ( char *fStr, char *bStr );
 char   *strdup                ( const char *s );
 int     strcasecmp            ( const char *s1, const char *s2 );
 bool    is_prefix             ( const char *aStr, const char *bStr );
+char   *smash_color	      ( const char *str );
+int	color_count	      ( const char *str );
 
 /*
  * help.c
