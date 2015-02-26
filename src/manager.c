@@ -148,6 +148,15 @@ int free_bucket( MEM_BUCKET *bucket )
 
 int free_buffer( D_BUFFER *buf )
 {
+   char *line;
+   ITERATOR Iter;
+
+   /* have to do a manual clear out here to make sure detachfromlist is called and memory manager is satisfied */
+   AttachIterator( &Iter, buf->lines );
+   while( ( line = (char *)NextInList( &Iter ) ) != NULL )
+      DetachFromList( line, buf->lines );
+   DetachIterator( &Iter );
+
    FreeList( buf->lines );
    free( buf );
    return 0;
