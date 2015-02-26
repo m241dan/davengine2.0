@@ -41,7 +41,7 @@ int new_bucket( MB_TYPE type, void *memory, size_t size )
    bucket->memory	= memory;
    bucket->mem_size	= size;
    bucket->type		= type;
-   bucket->reach	= 0;
+   bucket->reach	= AllocList();
    AttachToList( bucket, memory_management->zero_reach_list );
    return 1;
 }
@@ -122,12 +122,13 @@ int free_bucket( MEM_BUCKET *bucket )
 
    DetachFromList( bucket, memory_management->zero_reach_list );
 
-   if( bucket->reach > 0 )
+   if( SizeOfList( bucket->reach ) > 0 )
    {
       printf( "%s: will not free bucket, still in reach somewhere.\n", __FUNCTION__ );
       /* put it into the hash */
       return 0;
    }
+   FreeList( bucket->reach );
 
    switch( bucket->type )
    {
@@ -187,7 +188,7 @@ size_t get_size( const void *ptr )
 }
 
 /* utility */
-void reach_ptr( const void *ptr )
+void reach_ptr( const void *ptr, void **assignment )
 {
    MEM_BUCKET *bucket;
 
@@ -195,15 +196,17 @@ void reach_ptr( const void *ptr )
       return;
    if( ( bucket = get_bucket_for( ptr ) ) == NULL )
       return;
-   if( ++bucket->reach == 1 )
+   if( SizeOfList( bucket->reach ) == 0 )
    {
       DetachFromList( bucket, memory_management->zero_reach_list );
       hash_add( memory_management->reach_list, bucket, (long)ptr );
    }
+   AttachToList( assignment, bucket->reach );
+   hash_show( memory_management->reach_list );
    return;
 }
 
-void unreach_ptr( const void *ptr )
+void unreach_ptr( const void *ptr, void **assignment )
 {
    MEM_BUCKET *bucket;
 
@@ -211,11 +214,13 @@ void unreach_ptr( const void *ptr )
       return;
    if( ( bucket = get_bucket_for( ptr ) ) == NULL )
       return;
-   if( --bucket->reach == 0 )
+   if( SizeOfList( bucket->reach ) == 1 )
    {
       hash_remove( memory_management->reach_list, bucket, (long)ptr );
       AttachToList( bucket, memory_management->zero_reach_list );
    }
+   DetachFromList( assignment, bucket->reach );
+   hash_show( memory_management->reach_list );
    return;
 }
 
