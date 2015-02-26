@@ -4,6 +4,7 @@ typedef struct memory_bucket MEM_BUCKET;
 typedef struct memory_manager MEM_MANAGER;
 
 #define MANAGER_SIZE 1001
+#define STRING_PADDING 101
 
 typedef enum
 {
