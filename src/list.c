@@ -90,7 +90,8 @@ void AttachToList(void *pContent, LLIST *pList)
     return;
 
   pCell = AllocCell();
-  assign( pCell->_pContent,  pContent );
+  if( get_bucket_for( pList ) )
+     assign( pCell->_pContent,  pContent );
   pCell->_pNextCell = pList->_pFirstCell;
 
   if (pList->_pFirstCell != NULL)
@@ -116,7 +117,8 @@ void AttachToEnd( void *pContent, LLIST *pList )
    }
 
    pCell = AllocCell();
-   assign( pCell->_pContent, pContent );
+   if( get_bucket_for( pList ) )
+      assign( pCell->_pContent, pContent );
    pCell->_pPrevCell = pList->_pLastCell;
 
    if( pList->_pLastCell != NULL )
@@ -286,6 +288,7 @@ void FreeCell(CELL *pCell, LLIST *pList)
     pCell->_pNextCell->_pPrevCell = pCell->_pPrevCell;
 
    unassign( pCell->_pContent );
+   pCell->_pContent = NULL;
    free(pCell);
 }
 

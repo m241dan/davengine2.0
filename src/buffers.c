@@ -1,4 +1,5 @@
-/* buffer library for mud outputs */
+/* buffer library for mud outputs written by Davenge*/
+
 #include <ctype.h>
 #include <string.h>
 #include "mud.h"
@@ -9,7 +10,7 @@ int parse_into_buffer( D_BUFFER *buf, char *input )
    int real, x;
    bool newline, space;
 
-   while( *input != '\0' )
+   while( *input != '\0' ) 
    {
       newline = FALSE;
       space = FALSE;
@@ -18,26 +19,34 @@ int parse_into_buffer( D_BUFFER *buf, char *input )
       printf( "real %d\r\ninput %p\r\n", real, input );
       /* search out any new lines */
       for( x = 0; x < real; x++ )
+      {
+         printf( "x %d\r\nvalue '%c'\r\n", x, input[x] );
          if( input[x] == '\n' || input[x] == '\r' )
          {
             newline = TRUE;
-            real = ( x - 1 );
+            real = x;
             break;
          }
+      }
+      printf( "real %d\r\n", real );
       /* from the end, find a blank space to terminate at if not alreadyat one */
       if( !newline )
+      {
          for( ; x > 0; x-- )
+         {
             if( isspace( input[x] ) )
             {
                space = TRUE;
-               real = ( x - 1 );
+               real = x;
                break;
             }
+         }
+      }
       /* create line from the new "real length" */
       AttachToEnd( copy_string_fl( input, real ), buf->lines );
       /* increment the input pointer */
-      for( x = 0; x < real; x++ )
-         input++;
+      printf( "real %d\r\n", real );
+      input += real;
       if( newline )
       {
          if( *input == '\n' || *input == '\r' )
