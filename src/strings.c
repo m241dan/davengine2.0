@@ -162,7 +162,26 @@ int find_real_length( const char *str, int goal )
             real++;
          }
       }
+      x++;
       real++;
    }
-   return real;
+   return x;
+}
+
+char *copy_string_fl( const char *orig, int length )
+{
+   char *new_str;
+
+   new_str = str_alloc( length + STRING_PADDING );
+   for( int x = 0; x < length; x++ )
+   {
+      if( *orig == '\0' )
+      {
+         length = x;
+         break;
+      }
+      *new_str++ = *orig++;
+   }
+   new_str[length] = '\0';
+   return new_str;
 }

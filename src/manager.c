@@ -46,6 +46,7 @@ int new_bucket( MB_TYPE type, void *memory, size_t size )
    return 1;
 }
 
+/* ints */
 int *new_integer( int num )
 {
    size_t size = sizeof( int );
@@ -55,6 +56,8 @@ int *new_integer( int num )
    return ptr;
 }
 
+
+/* strings */
 char *new_string( const char *fmt, ... )
 {
    char *ptr;
@@ -99,6 +102,7 @@ char *str_alloc( size_t size )
    return ptr;
 }
 
+/* buffers */
 D_BUFFER *new_buffer( int width )
 {
    size_t size = sizeof( D_BUFFER );
@@ -211,7 +215,6 @@ void reach_ptr( const void *ptr, void **assignment )
       hash_add( memory_management->reach_list, bucket, (long)ptr );
    }
    AttachToList( assignment, bucket->reach );
-   hash_show( memory_management->reach_list );
    return;
 }
 
@@ -229,7 +232,6 @@ void unreach_ptr( const void *ptr, void **assignment )
       AttachToList( bucket, memory_management->zero_reach_list );
    }
    DetachFromList( assignment, bucket->reach );
-   hash_show( memory_management->reach_list );
    return;
 }
 

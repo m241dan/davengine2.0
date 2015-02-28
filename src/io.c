@@ -74,11 +74,11 @@ void bug(const char *txt, ...)
     communicate(NULL, "bug: cannot open bugfile", COMM_LOG);
     return;
   }
-
   fprintf(fp, "%s: %s\n", strtime, buf);
   fclose(fp);
 
   communicate(NULL, buf, COMM_LOG);
+   printf( "%s\n", buf );
 }
 
 /*

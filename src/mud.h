@@ -17,7 +17,6 @@
 #include "../lua-5.3.0/src/lua.h"
 #include "../lua-5.3.0/src/lualib.h"
 #include "../lua-5.3.0/src/lauxlib.h"
-
 /************************
  * Standard definitions *
  ************************/
@@ -176,6 +175,9 @@ typedef struct buffer_type
 #include "event.h"
 #include "lua_utils.h"
 #include "sqldb.h"
+
+/* tests.h should be last */
+#include "tests.h"
 
 /******************************
  * End of new structures      *

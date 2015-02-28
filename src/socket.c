@@ -71,6 +71,8 @@ int main(int argc, char **argv)
    /* init the memory manager */
    init_manager();
 
+   find_real_length_test();
+
    /* note that we are booting up */
    log_string("Program starting.");
 
