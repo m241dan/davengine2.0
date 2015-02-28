@@ -35,6 +35,8 @@ char 	   *DB_ADDR 		= NULL;
 char 	   *DB_LOGIN 		= NULL;
 char       *DB_PASSWORD 	= NULL;
 
+bool run_tests = TRUE;
+
 /* api handles */
 lua_State *lua_handle 	= NULL;
 MYSQL	  *sql_handle	= NULL;
@@ -71,8 +73,12 @@ int main(int argc, char **argv)
    /* init the memory manager */
    init_manager();
 
-   find_real_length_test();
-   copy_string_fl_test();
+   if( run_tests )
+   {
+      find_real_length_test();
+      copy_string_fl_test();
+      buffer_basics_test();
+   }
 
    /* note that we are booting up */
    log_string("Program starting.");

@@ -41,3 +41,13 @@ void copy_string_fl_test( void )
    else
       bug( "%s: Test 1 Failed. Result = %s\n", __FUNCTION__, string );
 }
+
+void buffer_basics_test( void )
+{
+   D_BUFFER *buf;
+
+   create_buffer( buf, 10, "This is a test string that is meant\n\r to wrap in a few places.\r\n" );
+   bug( "%s: The measuring stick -\r\nThis is a test string that is meant\n\r to wrap in a few places.\r\n.", __FUNCTION__ );
+   bug( "%s: Function Output -\r\n%s.", __FUNCTION__, buffer_to_string( buf ) );
+   bug( "%s: If the above two strings are the same, the test passed.", __FUNCTION__ );
+}

@@ -1,74 +1,86 @@
 /* buffer library for mud outputs */
-
+#include <ctype.h>
+#include <string.h>
 #include "mud.h"
 
 /* utility */
-/*
 int parse_into_buffer( D_BUFFER *buf, char *input )
 {
-   char *ptr, *line;
-   size_t size = ( buf->width * 3 ) + 1; * 3 three because each character code be a color, #rR = deep red 'R', three characters AND +1 for NULL terminator *
-   enum {
-      MODE_TEST, MODE_COPY, MODE_FIND_SPACE
-   } PARSE_MODE;
-   PARSE_MODE mode;
-   int x, parse_amount, noncolor_count;
+   int real, x;
+   bool newline, space;
 
-   if( !input || input[0] == '\0' )
+   while( *input != '\0' )
    {
-      bug( "%s: passed a blank or NULL input.", __FUNCTION__ );
-      return 0;
-   }
-
-   for( mode = MODE_TEST; *input == '\0'; )
-   {
-      switch( mode );
-      {
-         case MODE_TEST:
-            for( x = 0, noncolor_count = 0; ; x++)
+      newline = FALSE;
+      space = FALSE;
+      /* get the real length */
+      real = find_real_length( input, buf->width );
+      printf( "real %d\r\ninput %p\r\n", real, input );
+      /* search out any new lines */
+      for( x = 0; x < real; x++ )
+         if( input[x] == '\n' || input[x] == '\r' )
+         {
+            newline = TRUE;
+            real = ( x - 1 );
+            break;
+         }
+      /* from the end, find a blank space to terminate at if not alreadyat one */
+      if( !newline )
+         for( ; x > 0; x-- )
+            if( isspace( input[x] ) )
             {
-               * create new lines on...*
-               if( input[x] == '\n' )
-               {
-                  parse_amount = x;
-                  mode = MODE_COPY;
-                  break;
-               }
-               * create a new line, but don't copy the NULL terminator *
-               if( input[x] == '\0' )
-               {
-                  parse_amount = x - 1;
-                  mode = MODE_COPY;
-                  break;
-               }
-
-               if( input[x] == '#' )
-               {
-                  * if its a valid color code, skip it *
-                  if( input[x+1] != '\0' &&  input[x+1] != '#' )
-                  {
-                     x += 2;
-                     continue;
-                  }
-                  * its a double hashtag, so it counts as 1 real character but we need to take both so it doesn't get parsed out at color translation time *
-                  if( input[x+1] != '\0' )
-                  {
-                     x += 2;
-                     noncolor_count++;
-                  }
-               }
-               else
-                  noncolor_count++;
-
-
-               * check out amount of actual characters *
-               if( noncolor_count == buf->width )
-               {
-                  parse_amount = x;
-                  mode= MODE_FIND_SPACE;
-                  break;
-               }
+               space = TRUE;
+               real = ( x - 1 );
+               break;
             }
+      /* create line from the new "real length" */
+      AttachToEnd( copy_string_fl( input, real ), buf->lines );
+      /* increment the input pointer */
+      for( x = 0; x < real; x++ )
+         input++;
+      if( newline )
+      {
+         if( *input == '\n' || *input == '\r' )
+            input++;
+         if( *input == '\n' || *input == '\r' )
+            input++;
       }
+      if( space && isspace( *input ) )
+         input++;
    }
-} */
+   return 1;
+}
+
+char *buffer_to_string( D_BUFFER *buf )
+{
+   char *string, *line;
+   ITERATOR Iter;
+   int length;
+
+   /* raw length + \n\r for each line + padding */
+   length = get_buffer_length( buf ) + ( SizeOfList( buf->lines ) * 2 ), + STRING_PADDING;
+   /* +1 for NULL terminator */
+   string = str_alloc( length + 1 );
+
+   AttachIterator( &Iter, buf->lines );
+   while( ( line = (char *)NextInList( &Iter ) ) != NULL )
+   {
+      strcat( string, line );
+      strcat( string, "\n\r" );
+   }
+   string[length-STRING_PADDING] = '\0';
+   return string;
+}
+
+int get_buffer_length( D_BUFFER *buf )
+{
+   char *line;
+   ITERATOR Iter;
+   int length = 0;
+
+   AttachIterator( &Iter, buf->lines );
+   while( ( line = (char *)NextInList( &Iter ) ) != NULL )
+      length += strlen( line );
+   DetachIterator( &Iter );
+   return length;
+}
