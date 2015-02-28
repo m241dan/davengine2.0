@@ -3,6 +3,7 @@
  * The implementation of a basic double-linked list
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "hash.h"
@@ -90,8 +91,7 @@ void AttachToList(void *pContent, LLIST *pList)
     return;
 
   pCell = AllocCell();
-  if( get_bucket_for( pList ) )
-     assign( pCell->_pContent,  pContent );
+  pCell->_pContent = pContent;
   pCell->_pNextCell = pList->_pFirstCell;
 
   if (pList->_pFirstCell != NULL)
@@ -117,8 +117,7 @@ void AttachToEnd( void *pContent, LLIST *pList )
    }
 
    pCell = AllocCell();
-   if( get_bucket_for( pList ) )
-      assign( pCell->_pContent, pContent );
+   pCell->_pContent = pContent;
    pCell->_pPrevCell = pList->_pLastCell;
 
    if( pList->_pLastCell != NULL )
@@ -155,7 +154,7 @@ void InsertBefore( void *pContent, LLIST *pList, void *bContent )
       return;
 
    pCell = AllocCell();
-   assign( pCell->_pContent, pContent );
+   pCell->_pContent = pContent;
    pCell->_pNextCell = bCell;
    if( bCell->_pPrevCell )
    {
@@ -193,7 +192,7 @@ void InsertAfter( void *pContent, LLIST *pList, void *aContent )
       return;
 
    pCell = AllocCell();
-   assign( pCell->_pContent, pContent );
+   pCell->_pContent = pContent;
    pCell->_pPrevCell = aCell;
    if( aCell->_pNextCell )
    {
@@ -232,7 +231,6 @@ void DetachIterator(ITERATOR *pIter)
   if (pList != NULL)
   {
     pList->_iterators--;
-
     /* if this is the only iterator, free all invalid cells */
     if (pList->_iterators <= 0)
     {
@@ -287,7 +285,6 @@ void FreeCell(CELL *pCell, LLIST *pList)
   if (pCell->_pNextCell != NULL)
     pCell->_pNextCell->_pPrevCell = pCell->_pPrevCell;
 
-   unassign( pCell->_pContent );
    pCell->_pContent = NULL;
    free(pCell);
 }

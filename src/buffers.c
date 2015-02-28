@@ -16,11 +16,9 @@ int parse_into_buffer( D_BUFFER *buf, char *input )
       space = FALSE;
       /* get the real length */
       real = find_real_length( input, buf->width );
-      printf( "real %d\r\ninput %p\r\n", real, input );
       /* search out any new lines */
       for( x = 0; x < real; x++ )
       {
-         printf( "x %d\r\nvalue '%c'\r\n", x, input[x] );
          if( input[x] == '\n' || input[x] == '\r' )
          {
             newline = TRUE;
@@ -28,7 +26,6 @@ int parse_into_buffer( D_BUFFER *buf, char *input )
             break;
          }
       }
-      printf( "real %d\r\n", real );
       /* from the end, find a blank space to terminate at if not alreadyat one */
       if( !newline )
       {
@@ -45,7 +42,6 @@ int parse_into_buffer( D_BUFFER *buf, char *input )
       /* create line from the new "real length" */
       AttachToEnd( copy_string_fl( input, real ), buf->lines );
       /* increment the input pointer */
-      printf( "real %d\r\n", real );
       input += real;
       if( newline )
       {

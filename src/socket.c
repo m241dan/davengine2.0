@@ -77,7 +77,7 @@ int main(int argc, char **argv)
    {
       find_real_length_test();
       copy_string_fl_test();
-      buffer_basics_test();
+/*      buffer_basics_test(); */
    }
 
    /* note that we are booting up */

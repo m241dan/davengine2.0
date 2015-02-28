@@ -13,7 +13,7 @@ struct mud_buffer
    BUFFER_FAVOR	 favor;
 };
 
-#define create_buffer( buf, width, input )				\
+#define create_buffer( buf, width, input )			\
 {								\
    (buf) = new_buffer( (width) );				\
    if( !parse_into_buffer( (buf), (input) ) )			\

@@ -105,11 +105,14 @@ char *str_alloc( size_t size )
 /* buffers */
 D_BUFFER *new_buffer( int width )
 {
-   size_t size = sizeof( D_BUFFER );
-   D_BUFFER *buf = malloc( size );
-   buf->width = width;
-   buf->favor = BOT_FAVOR;
-   buf->lines = AllocList();
+   D_BUFFER *buf;
+   size_t size;
+
+   size		= sizeof( D_BUFFER );
+   buf		= malloc( size );
+   buf->width 	= width;
+   buf->favor 	= BOT_FAVOR;
+   buf->lines 	= AllocList();
 
    new_bucket( MEM_BUFFER, buf, size );
    return buf;
@@ -118,6 +121,7 @@ D_BUFFER *new_buffer( int width )
 /* destroyers */
 int free_bucket( MEM_BUCKET *bucket )
 {
+   printf( "What kind of bucket am I? %d\r\n", (int)bucket->type );
    if( !bucket )
    {
       printf( "%s: attempt to free NULL bucket.\n", __FUNCTION__ );
@@ -130,22 +134,23 @@ int free_bucket( MEM_BUCKET *bucket )
    {
       printf( "%s: will not free bucket, still in reach somewhere.\n", __FUNCTION__ );
       /* put it into the hash */
+      hash_add( memory_management->reach_list, bucket, (long)bucket->memory );
       return 0;
    }
    FreeList( bucket->reach );
+   bucket->reach = NULL;
 
    switch( bucket->type )
    {
       case MEM_INTEGER:
       case MEM_STRING:
-         free( bucket->memory );
-         bucket->memory = NULL;
+         free( (char *)bucket->memory );
          break;
       case MEM_BUFFER:
          free_buffer( (D_BUFFER *)bucket->memory );
-         bucket->memory = NULL;
          break;
    }
+   bucket->memory = NULL;
    free( bucket );
    return 1;
 }
@@ -162,6 +167,7 @@ int free_buffer( D_BUFFER *buf )
    DetachIterator( &Iter );
 
    FreeList( buf->lines );
+   buf->lines = NULL;
    free( buf );
    return 0;
 }
