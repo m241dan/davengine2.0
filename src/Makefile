@@ -4,7 +4,8 @@ L_FLAGS = -lz -lpthread -lcrypt -llua -ldl -lm `mysql_config --libs`
 
 O_FILES = socket.o io.o strings.o utils.o interpret.o help.o  \
 	  mccp.o save.o event.o event-handler.o buffers.o \
-	  list.o stack.o hash.o manager.o lua_utils.o sqldb.o
+	  list.o stack.o hash.o manager.o lua_utils.o sqldb.o \
+          tests.o
 
 all: $(O_FILES)
 	rm -f SocketMud

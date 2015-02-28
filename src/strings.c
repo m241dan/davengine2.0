@@ -138,3 +138,31 @@ int color_count( const char *str )
 
    return count;
 }
+
+int find_real_length( const char *str, int goal )
+{
+   int x, real;
+
+   for( x = 0, real = 0; str[x] != '\0' && real < goal; )
+   {
+      if( str[x] == '#' )
+      {
+         /* hash at the end of a line */
+         if( str[x+1] == '\0' )
+            break;
+         /* valid color tag */
+         if( str[x+1] != '#' )
+         {
+            x += 2;
+            continue;
+         }
+         else /* double hash */
+         {
+            x += 2;
+            real++;
+         }
+      }
+      real++;
+   }
+   return real;
+}

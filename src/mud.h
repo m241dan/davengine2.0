@@ -272,7 +272,7 @@ int     strcasecmp            ( const char *s1, const char *s2 );
 bool    is_prefix             ( const char *aStr, const char *bStr );
 char   *smash_color	      ( const char *str );
 int	color_count	      ( const char *str );
-
+int	find_real_length      ( const char *str, int goal );
 /*
  * help.c
  */
