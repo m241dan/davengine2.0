@@ -1,5 +1,6 @@
 /* This is a library of tests for the mud written by Davenge */
 
+#include <string.h>
 #include "mud.h"
 
 void find_real_length_test( void )
@@ -30,4 +31,13 @@ void find_real_length_test( void )
       bug( "%s: Test 4 Failed. Real %d should be 18", __FUNCTION__, real );
    else
       bug( "%s: Test 4 Passed.", __FUNCTION__ );
+}
+
+void copy_string_fl_test( void )
+{
+   char *string = copy_string_fl( "#rT#zhis is a #CColor #pString", 18 );
+    if( !strcmp( string, "#rT#zhis is a #CCo" ) )
+      bug( "%s: Test 1 Passed.", __FUNCTION__ );
+   else
+      bug( "%s: Test 1 Failed. Result = %s\n", __FUNCTION__, string );
 }

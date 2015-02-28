@@ -170,18 +170,12 @@ int find_real_length( const char *str, int goal )
 
 char *copy_string_fl( const char *orig, int length )
 {
-   char *new_str;
+   char *new_str, *ptr;
 
    new_str = str_alloc( length + STRING_PADDING );
-   for( int x = 0; x < length; x++ )
-   {
-      if( *orig == '\0' )
-      {
-         length = x;
-         break;
-      }
-      *new_str++ = *orig++;
-   }
-   new_str[length] = '\0';
+   ptr = new_str;
+   for( int x = 0; x < length && *orig != '\0'; x++ )
+      *ptr++ = *orig++;
+   *ptr = '\0';
    return new_str;
 }
