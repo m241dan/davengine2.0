@@ -99,7 +99,6 @@ void AttachToList(void *pContent, LLIST *pList)
     pList->_pLastCell = pCell;
 
   pList->_pFirstCell = pCell;
-
   pList->_size++;
 }
 
@@ -118,7 +117,7 @@ void AttachToEnd( void *pContent, LLIST *pList )
 
    pCell = AllocCell();
    assign( pCell->_pContent, pContent );
-   pCell->_pNextCell = pList->_pFirstCell;
+   pCell->_pPrevCell = pList->_pLastCell;
 
    if( pList->_pLastCell != NULL )
       pList->_pLastCell->_pNextCell = pCell;
