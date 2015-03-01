@@ -10,7 +10,7 @@ int parse_into_buffer( D_BUFFER *buf, char *input )
    int real, x;
    bool newline, space;
 
-   while( *input != '\0' ) 
+   while( *input != '\0' )
    {
       newline = FALSE;
       space = FALSE;
@@ -73,7 +73,8 @@ char *buffer_to_string( D_BUFFER *buf )
       strcat( string, line );
       strcat( string, "\n\r" );
    }
-   string[length-STRING_PADDING] = '\0';
+   DetachIterator( &Iter );
+   string[length] = '\0';
    return string;
 }
 

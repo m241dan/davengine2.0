@@ -38,19 +38,6 @@ struct memory_manager
    ptr = NULL;				\
 }
 
-#define assignlist( ptr, data )		\
-{					\
-   unreach_list( ptr, (void **)&ptr );  \
-   ptr = data;				\
-   reach_list( ptr, (void **)&ptr );	\
-}
-
-#define unassignlist( ptr )		\
-{					\
-   unreach_list( ptr, (void **)&ptr );	\
-   ptr = NULL;				\
-}
-
 /* creators */
 int		 init_manager		( void );
 int		 new_bucket		( MB_TYPE type, void *memory, size_t size );
@@ -72,8 +59,6 @@ size_t		 get_size		( const void *ptr );
 /* utility */
 void 		 reach_ptr		( const void *ptr, void **assignment );
 void 		 unreach_ptr		( const void *ptr, void **assignment );
-void		 reach_list		( const void *ptr, void **assignment );
-void		 unreach_list		( const void *ptr, void **assignment );
 void		 reach_list_content	( LLIST *list );
 void		 unreach_list_content	( LLIST *list );
 
