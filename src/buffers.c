@@ -4,6 +4,7 @@
 #include <string.h>
 #include "mud.h"
 
+
 /* utility */
 int parse_into_buffer( D_BUFFER *buf, char *input )
 {
