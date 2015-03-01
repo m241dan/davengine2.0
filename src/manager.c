@@ -18,7 +18,7 @@ MEM_MANAGER *memory_management = NULL;
 int init_manager( void )
 {
    memory_management 			= malloc( sizeof( MEM_MANAGER ) );
-   memory_management->zero_reach_list 	= AllocList();
+   memory_management->zero_reach_list	= AllocList();
    memory_management->reach_list 	= init_hash( NUMERIC_HASH, MANAGER_SIZE );
    return 1;
 }
@@ -118,6 +118,16 @@ D_BUFFER *new_buffer( int width )
    return buf;
 }
 
+/* linked lists */
+LLIST *new_list( void )
+{
+   LLIST *list;
+   list 		= AllocList();
+   list->_managed 	= 1;
+   new_bucket( MEM_LIST, list, sizeof( LLIST ) );
+   return list;
+}
+
 /* destroyers */
 int free_bucket( MEM_BUCKET *bucket )
 {
@@ -129,7 +139,6 @@ int free_bucket( MEM_BUCKET *bucket )
    }
 
    DetachFromList( bucket, memory_management->zero_reach_list );
-
    if( SizeOfList( bucket->reach ) > 0 )
    {
       printf( "%s: will not free bucket, still in reach somewhere.\n", __FUNCTION__ );
@@ -148,6 +157,9 @@ int free_bucket( MEM_BUCKET *bucket )
          break;
       case MEM_BUFFER:
          free_buffer( (D_BUFFER *)bucket->memory );
+         break;
+      case MEM_LIST:
+         FreeList( (LLIST *)bucket->memory );
          break;
    }
    bucket->memory = NULL;
@@ -239,6 +251,84 @@ void unreach_ptr( const void *ptr, void **assignment )
    }
    DetachFromList( assignment, bucket->reach );
    return;
+}
+
+void reach_list( const void *ptr, void **assignment )
+{
+   MEM_BUCKET *bucket;
+
+   if( !ptr )
+      return;
+   if( ( bucket = get_bucket_for( ptr ) ) == NULL )
+      return;
+   if( bucket->type != MEM_LIST )
+   {
+      printf( "%s: Attempting to reach non-list ptr.\n", __FUNCTION__ );
+      return;
+   }
+   if( SizeOfList( bucket->reach ) == 0 )
+   {
+      DetachFromList( bucket, memory_management->zero_reach_list );
+      hash_add( memory_management->reach_list, bucket, (long)ptr );
+      if( SizeOfList( (LLIST *)bucket->memory ) > 0 )
+         reach_list_content( (LLIST *)bucket->memory );
+   }
+   AttachToList( assignment, bucket->reach );
+   return;
+}
+
+void unreach_list( const void *ptr, void **assignment )
+{
+   MEM_BUCKET *bucket;
+
+   if( !ptr )
+      return;
+   if( ( bucket = get_bucket_for( ptr ) ) == NULL )
+      return;
+   if( bucket->type != MEM_LIST )
+   {
+      printf( "%s: Attempting to reach non-list ptr.\n", __FUNCTION__ );
+      return;
+   }
+   if( SizeOfList( bucket->reach ) == 1 )
+   {
+      hash_remove( memory_management->reach_list, bucket, (long)ptr );
+      AttachToList( bucket, memory_management->zero_reach_list );
+      if( SizeOfList( (LLIST *)bucket->memory ) > 0 )
+         unreach_list_content( (LLIST *)bucket->memory );
+   }
+   DetachFromList( assignment, bucket->reach );
+}
+
+void reach_list_content( LLIST *list )
+{
+   CELL *cell_ptr;
+   ITERATOR Iter;
+
+   if( SizeOfList( list ) > 0 )
+   {
+      AttachIterator( &Iter, list );
+      while( ( cell_ptr = NextCellInList( &Iter ) ) != NULL )
+      /* do it manually here instead of using the macro to avoid funky interactions */
+         reach_ptr( cell_ptr->_pContent, (void **)&cell_ptr->_pContent );
+      DetachIterator( &Iter );
+   }
+}
+
+void unreach_list_content( LLIST *list )
+{
+   CELL *cell_ptr;
+   ITERATOR Iter;
+
+   if( SizeOfList( list ) > 0 )
+   {
+      AttachIterator( &Iter, list );
+      while( ( cell_ptr = NextCellInList( &Iter ) ) != NULL )
+      {
+         unassign( cell_ptr->_pContent );
+      }
+      DetachIterator( &Iter );
+   }
 }
 
 /* monitor */
