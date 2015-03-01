@@ -237,7 +237,6 @@ void reach_ptr( const void *ptr, void **assignment )
          case MEM_BUFFER:
          {
             D_BUFFER *buf = (D_BUFFER *)bucket->memory;
-            bug( "%s: being called\n", __FUNCTION__ );
             reach_ptr( buf->lines, (void **)&buf->lines );
             break;
          }
