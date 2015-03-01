@@ -13,8 +13,6 @@ typedef enum
 
 struct memory_bucket
 {
-   MEM_BUCKET	*next;
-   MEM_BUCKET	*prev;
    void 	*memory;
    size_t	 mem_size;
    unsigned char type;
@@ -23,8 +21,7 @@ struct memory_bucket
 
 struct memory_manager
 {
-   MEM_BUCKET	*zero_first;
-   MEM_BUCKET	*zero_last;
+   LLIST	*zero_reach_list;
    D_HASH 	*reach_list;
 };
 
