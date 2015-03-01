@@ -18,14 +18,16 @@ void  InvalidateCell  ( CELL *pCell );
 
 LLIST *AllocList()
 {
-  LLIST *pList;
+   LLIST *pList;
 
-  pList = malloc(sizeof(*pList));
-  pList->_pFirstCell = NULL;
-  pList->_pLastCell = NULL;
-  pList->_iterators = 0;
-  pList->_valid = 1;
-  pList->_size = 0;
+   pList = malloc(sizeof(*pList));
+   pList->_pFirstCell 	= NULL;
+   pList->_pLastCell 	= NULL;
+   pList->_iterators 	= 0;
+   pList->_valid 	= 1;
+   pList->_size 	= 0;
+   pList->_managed 	= 0;
+   pList->_reached	= 0;
 
   return pList;
 }
@@ -91,7 +93,12 @@ void AttachToList(void *pContent, LLIST *pList)
     return;
 
   pCell = AllocCell();
-  pCell->_pContent = pContent;
+   if( pList->_managed && pList->_reached )
+   {
+      assign( pCell->_pContent, pContent );
+   }
+   else
+      pCell->_pContent = pContent;
   pCell->_pNextCell = pList->_pFirstCell;
 
   if (pList->_pFirstCell != NULL)
@@ -117,7 +124,12 @@ void AttachToEnd( void *pContent, LLIST *pList )
    }
 
    pCell = AllocCell();
-   pCell->_pContent = pContent;
+   if( pList->_managed && pList->_reached )
+   {
+      assign( pCell->_pContent, pContent );
+   }
+   else
+      pCell->_pContent = pContent;
    pCell->_pPrevCell = pList->_pLastCell;
 
    if( pList->_pLastCell != NULL )
@@ -154,7 +166,12 @@ void InsertBefore( void *pContent, LLIST *pList, void *bContent )
       return;
 
    pCell = AllocCell();
-   pCell->_pContent = pContent;
+   if( pList->_managed && pList->_reached )
+   {
+      assign( pCell->_pContent, pContent );
+   }
+   else
+      pCell->_pContent = pContent;
    pCell->_pNextCell = bCell;
    if( bCell->_pPrevCell )
    {
@@ -192,7 +209,12 @@ void InsertAfter( void *pContent, LLIST *pList, void *aContent )
       return;
 
    pCell = AllocCell();
-   pCell->_pContent = pContent;
+   if( pList->_managed && pList->_reached )
+   {
+      assign( pCell->_pContent, pContent );
+   }
+   else
+      pCell->_pContent = pContent;
    pCell->_pPrevCell = aCell;
    if( aCell->_pNextCell )
    {
@@ -285,7 +307,12 @@ void FreeCell(CELL *pCell, LLIST *pList)
   if (pCell->_pNextCell != NULL)
     pCell->_pNextCell->_pPrevCell = pCell->_pPrevCell;
 
-   pCell->_pContent = NULL;
+   if( pList->_managed && pList->_reached )
+   {
+      unassign( pCell->_pContent );
+   }
+   else
+      pCell->_pContent = NULL;
    free(pCell);
 }
 
@@ -311,6 +338,22 @@ void *NextInList(ITERATOR *pIter)
   }
 
   return pContent;
+}
+
+CELL *NextCellInList( ITERATOR *pIter )
+{
+   CELL *pCell;
+   while( pIter->_pCell != NULL && !pIter->_pCell->_valid )
+   {
+      pIter->_pCell = pIter->_pCell->_pNextCell;
+   }
+
+   if( pIter->_pCell != NULL )
+   {
+      pCell = pIter->_pCell;
+      pIter->_pCell = pIter->_pCell->_pNextCell;
+   }
+   return pCell;
 }
 
 void *PrevInList( ITERATOR *pIter )
