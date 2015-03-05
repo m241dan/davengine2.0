@@ -57,6 +57,12 @@ int parse_into_buffer( D_BUFFER *buf, char *input )
    return 1;
 }
 
+int set_favor( D_BUFFER *buf, BUFFER_FAVOR favor )
+{
+   buf->favor = favor;
+   return 1;
+}
+
 char *buffer_to_string( D_BUFFER *buf )
 {
    char *string, *line;
@@ -110,11 +116,16 @@ char *buffers_to_string( D_BUFFER *buffers[], int size )
    }
    string = str_alloc( ( ( width * max_lines ) * STRING_PADDING ) );
    /* iterate through and create the string */
+   printf( "%s: max_lines %d\r\n", __FUNCTION__, max_lines );
+   for( x = 0; x < size; x++ )
+   {
+      printf( "%s: buffer %d lines %d print_start %d\r\n", __FUNCTION__, x, SizeOfList( buffers[x]->lines ), print_start[x] );
+   }
    for( y = 0; y < max_lines; y++ )
    {
       for( x = 0; x < size; x++ )
       {
-         if( print_start[x] >= y && y < SizeOfList( buffers[x]->lines ) )
+         if( print_start[x] <= y && y < SizeOfList( buffers[x]->lines ) )
          {
             if( ( line = (char *)NextInList( &Iter[x] ) ) != NULL )
             {

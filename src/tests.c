@@ -56,8 +56,11 @@ void buffer_basics_test2( void )
 {
    D_BUFFER *buf[NUM_BUFFERS];
 
-   create_buffer( buf[0], 20, "H:127/127 M: 200/200 \r\n" );
-   create_buffer( buf[1], 50, "This is just a simple little test to see how promptand buffers will interact\r\n" );
-   create_buffer( buf[2], 50, "/----------------------------\\r\n|              |\r\n\\---------------------/\r\n" );
+   create_buffer( buf[0], 22, "H:127/127 M: 200/200 \r\n" );
+   create_buffer( buf[1], 50, "This is just a simple little test to see how prompt and buffers will interact\r\n" );
+   create_buffer( buf[2], 50, "/----------------------------\\\r\n|                            |\r\n\\----------------------------/\r\n" );
+   set_favor( buf[0], BOT_FAVOR );
+   set_favor( buf[1], TOP_FAVOR );
    bug( "%s: Does this look right?\r\n\r\n%s", __FUNCTION__, buffers_to_string( buf, 3 ) );
+   
 }
