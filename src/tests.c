@@ -46,8 +46,18 @@ void buffer_basics_test( void )
 {
    D_BUFFER *buf;
 
-   create_buffer( buf, 10, "This is a test string that is meant\n\r to wrap in a few places.\r\n" );
-   bug( "%s: The measuring stick -\r\nThis is a test string that is meant\n\r to wrap in a few places.\r\n.", __FUNCTION__ );
+   create_buffer( buf, 20, "This is a test string that is meant\n\rto wrap in a few places.\r\n" );
+   bug( "%s: The measuring stick -\r\nThis is a test string that is meant\n\rto wrap in a few places.\r\n.", __FUNCTION__ );
    bug( "%s: Function Output -\r\n%s.", __FUNCTION__, buffer_to_string( buf ) );
    bug( "%s: If the above two strings are the same, the test passed.", __FUNCTION__ );
+}
+
+void buffer_basics_test2( void )
+{
+   D_BUFFER *buf[NUM_BUFFERS];
+
+   create_buffer( buf[0], 20, "H:127/127 M: 200/200 \r\n" );
+   create_buffer( buf[1], 50, "This is just a simple little test to see how promptand buffers will interact\r\n" );
+   create_buffer( buf[2], 50, "/----------------------------\\r\n|              |\r\n\\---------------------/\r\n" );
+   bug( "%s: Does this look right?\r\n\r\n%s", __FUNCTION__, buffers_to_string( buf, 3 ) );
 }

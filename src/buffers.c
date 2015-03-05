@@ -72,10 +72,68 @@ char *buffer_to_string( D_BUFFER *buf )
    while( ( line = (char *)NextInList( &Iter ) ) != NULL )
    {
       strcat( string, line );
-      strcat( string, "\n\r" );
+      strcat( string, "\r\n" );
    }
    DetachIterator( &Iter );
    string[length] = '\0';
+   return string;
+}
+
+char *buffers_to_string( D_BUFFER *buffers[], int size )
+{
+   ITERATOR Iter[size];
+   char *string, *line;
+   int print_start[size];
+   int width, max_lines, x, y, padding;
+
+   /* find the raw length of all the buffers added together *
+    * and find the max lines and attach iterators */
+   for( x = 0, width = 0, max_lines = 0; x < size; x++ )
+   {
+      if( SizeOfList( buffers[x]->lines ) > max_lines )
+         max_lines = SizeOfList( buffers[x]->lines );
+      width += buffers[x]->width;
+      AttachIterator( &Iter[x], buffers[x]->lines );
+   }
+   /* figure out the bounds for bot/mid/top favored buffers */
+   for( x = 0; x < size; x++ )
+   {
+      if( SizeOfList( buffers[x]->lines ) == max_lines || buffers[x]->favor == TOP_FAVOR )
+      {
+         print_start[x] = 0;
+         continue;
+      }
+      else
+         print_start[x] = max_lines - SizeOfList( buffers[x]->lines );
+      if( buffers[x]->favor == MID_FAVOR )
+         print_start[x] /= 2;
+   }
+   string = str_alloc( ( ( width * max_lines ) * STRING_PADDING ) );
+   /* iterate through and create the string */
+   for( y = 0; y < max_lines; y++ )
+   {
+      for( x = 0; x < size; x++ )
+      {
+         if( print_start[x] >= y && y < SizeOfList( buffers[x]->lines ) )
+         {
+            if( ( line = (char *)NextInList( &Iter[x] ) ) != NULL )
+            {
+               strcat( string, line );
+               if( ( padding = buffers[x]->width - strlen( line ) ) != 0 )
+                  strcat( string, create_pattern( " ", padding ) );
+            }
+            else
+               strcat( string, create_pattern( " ", buffers[x]->width ) );
+         }
+         else
+            strcat( string, create_pattern( " ", buffers[x]->width ) );
+      }
+      strcat( string, "\r\n" );
+   }
+   /* terminate, remove iterators and return */
+   for( x = 0; x < size; x++ )
+      DetachIterator( &Iter[x] );
+   string[width * max_lines] = '\0';
    return string;
 }
 

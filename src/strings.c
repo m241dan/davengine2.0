@@ -179,3 +179,44 @@ char *copy_string_fl( const char *orig, int length )
    *ptr = '\0';
    return new_str;
 }
+
+char *create_pattern( const char *pattern, int width )
+{
+   char *buf;
+   const char *pat_ptr;
+   char *buf_ptr;
+   int x;
+
+   if( !pattern || pattern[0] == '\0' )
+   {
+      bug( "%s: passed a NULL pattern.", __FUNCTION__ );
+      return NULL;
+   }
+
+   buf = str_alloc( ( width * strlen( pattern ) ) + STRING_PADDING );
+
+   buf_ptr = buf;
+   pat_ptr = pattern;
+
+   for( x = 0; x < width; )
+   {
+      if( *pat_ptr == '\0' )
+         pat_ptr = pattern;
+
+      if( *pat_ptr == '#' )
+      {
+         *buf_ptr++ = *pat_ptr++;
+         if( *pat_ptr == '\0' )
+         {
+            x++;
+            continue;
+         }
+         *buf_ptr++ = *pat_ptr++;
+         continue;
+      }
+      *buf_ptr++ = *pat_ptr++;
+      x++;
+   }
+   buf[width * strlen( pattern )] = '\0';
+   return buf;
+}
