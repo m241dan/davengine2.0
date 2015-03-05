@@ -125,7 +125,7 @@ char *buffers_to_string( D_BUFFER *buffers[], int size )
    {
       for( x = 0; x < size; x++ )
       {
-         if( print_start[x] <= y && y < SizeOfList( buffers[x]->lines ) )
+         if( print_start[x] <= y && y < ( SizeOfList( buffers[x]->lines ) + print_start[x] ) )
          {
             if( ( line = (char *)NextInList( &Iter[x] ) ) != NULL )
             {
