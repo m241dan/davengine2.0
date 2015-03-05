@@ -57,10 +57,11 @@ void buffer_basics_test2( void )
    D_BUFFER *buf[NUM_BUFFERS];
 
    create_buffer( buf[0], 22, "H:127/127 M: 200/200 \r\n" );
-   create_buffer( buf[1], 50, "This is just a simple little test to see how prompt and buffers will interact\r\n" );
-   create_buffer( buf[2], 50, "/----------------------------\\\r\n|                            |\r\n\\----------------------------/\r\n" );
+   create_buffer( buf[1], 50, "This is a simple test to see how prompt and buffers will interact. At first you'll see a 'dummy map' on the right. It's only supposed to be three lines with the mid line being blank. On the left, you'll see an example of a bottom favored buffer only printing out its small output at the bottom. The map on the right is mid favored.\r\n" );
+   create_buffer( buf[2], 50, " /----------------------------\\\r\n |                            |\r\n \\----------------------------/\r\n" );
    set_favor( buf[0], BOT_FAVOR );
    set_favor( buf[1], TOP_FAVOR );
-   bug( "%s: Does this look right?\r\n\r\n%s", __FUNCTION__, buffers_to_string( buf, 3 ) );
+   set_favor( buf[2], MID_FAVOR );
+   bug( "%s: Does this look right?\r\n\r\n%s\r\n.", __FUNCTION__, buffers_to_string( buf, 3 ) );
    
 }

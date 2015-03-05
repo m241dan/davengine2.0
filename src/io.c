@@ -60,7 +60,7 @@ void log_string(const char *txt, ...)
 void bug(const char *txt, ...)
 {
   FILE *fp;
-  char buf[MAX_BUFFER];
+  char buf[MAX_BUFFER * 4];
   va_list args;
   char *strtime = get_time();
 

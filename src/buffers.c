@@ -114,7 +114,7 @@ char *buffers_to_string( D_BUFFER *buffers[], int size )
       if( buffers[x]->favor == MID_FAVOR )
          print_start[x] /= 2;
    }
-   string = str_alloc( ( ( width * max_lines ) * STRING_PADDING ) );
+   string = str_alloc( ( ( ( width + 2 ) * max_lines ) * STRING_PADDING ) );
    /* iterate through and create the string */
    printf( "%s: max_lines %d\r\n", __FUNCTION__, max_lines );
    for( x = 0; x < size; x++ )
@@ -144,7 +144,7 @@ char *buffers_to_string( D_BUFFER *buffers[], int size )
    /* terminate, remove iterators and return */
    for( x = 0; x < size; x++ )
       DetachIterator( &Iter[x] );
-   string[width * max_lines] = '\0';
+   string[( width + 2 ) * max_lines] = '\0';
    return string;
 }
 
