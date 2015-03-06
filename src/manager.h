@@ -100,10 +100,14 @@ char		*new_string		( const char *fmt, ... );
 char		*str_alloc		( size_t size );
 D_BUFFER	*new_buffer		( int width );
 LLIST		*new_list		( void );
+LUA_CHUNK	*new_chunk		( void );
+LUA_VAR		*new_var		( void );
 
 /* destroyers */
 int 		 free_bucket		( MEM_BUCKET *bucket );
 int		 free_buffer		( D_BUFFER *buf );
+int		 free_chunk		( LUA_CHUNK *chunk );
+int		 free_var		( LUA_VAR *var );
 
 /* getters */
 int 		 get_zero_reach_size	( void );

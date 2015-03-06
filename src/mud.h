@@ -113,6 +113,8 @@ typedef struct  dMobile       D_MOBILE;
 typedef struct  help_data     HELP_DATA;
 typedef struct  lookup_data   LOOKUP_DATA;
 typedef struct  event_data    EVENT_DATA;
+typedef struct  lua_var_chunk LUA_CHUNK;
+typedef struct  lua_var	      LUA_VAR;
 
 /* the actual structures */
 struct dSocket
