@@ -36,6 +36,7 @@ bool	 set_var_to_chunk	( LUA_VAR *var, LUA_CHUNK *chunk );
 bool	 rem_var_from_chunk	( LUA_VAR *var, LUA_CHUNK *chunk );
 bool	 set_chunk_to_entity	( LUA_CHUNK *chunk, void *entity );
 bool     set_var_name		( LUA_VAR *var, char *name );
+bool	 set_var_script		( LUA_VAR *var, char *path );
 bool     set_var_to_string	( LUA_VAR *var, char *string );
 bool	 set_var_to_int		( LUA_VAR *var, long int value );
 

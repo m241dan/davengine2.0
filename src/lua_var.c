@@ -75,6 +75,13 @@ bool set_var_name(LUA_VAR *var, char *name )
    return TRUE;
 }
 
+bool set_var_script( LUA_VAR *var, char *path )
+{
+   assign( var->script, path );
+   /* sql stuff */
+   return TRUE;
+}
+
 bool set_var_to_string( LUA_VAR *var, char *string )
 {
    if( var->type != TYPE_INT && var->type != TYPE_UNSET )
