@@ -177,6 +177,7 @@ typedef struct buffer_type
 #include "event.h"
 #include "lua_utils.h"
 #include "sqldb.h"
+#include "lua_var.h"
 
 /* tests.h should be last */
 #include "tests.h"

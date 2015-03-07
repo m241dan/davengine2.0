@@ -119,9 +119,48 @@ LLIST *new_list( void )
 {
    LLIST *list;
    list 		= AllocList();
-   list->_managed 	= 1;
    new_bucket( MEM_LIST, list, sizeof( LLIST ) );
    return list;
+}
+
+D_HASH *new_hash( int type, int size )
+{
+   D_HASH *hash;
+   hash		= init_hash( type, size );
+   new_bucket( MEM_HASH, hash, sizeof( D_HASH ) );
+   return hash;
+}
+
+LUA_CHUNK *new_chunk( int size )
+{
+   LUA_CHUNK *chunk;
+
+   if( size < 1 )
+   {
+      bug( "%s: attempting to create with size less than 1.", __FUNCTION__ );
+      return NULL;
+   }
+   chunk 		= malloc( sizeof( LUA_CHUNK ) );
+   assign( chunk->chunk, new_hash( ASCII_HASH, size ) );
+   chunk->owner		= NULL;
+   chunk->type		= VOT_UNOWNED;
+   chunk->var_count	= 0;
+   new_bucket( MEM_CHUNK, chunk, sizeof( LUA_CHUNK ) );
+   return chunk;
+}
+
+LUA_VAR *new_var( void )
+{
+   LUA_VAR *var;
+
+   var 		= malloc( sizeof( LUA_VAR ) );
+   assign( var->owners, new_list() );
+   var->name	= NULL;
+   var->data	= 0;
+   var->type	= TYPE_UNSET;
+   var->script	= NULL;
+   new_bucket( MEM_VAR, var, sizeof( LUA_VAR ) );
+   return var;
 }
 
 /* destroyers */
@@ -146,6 +185,9 @@ int free_bucket( MEM_BUCKET *bucket )
 
    switch( bucket->type )
    {
+      default:
+         bug( "%s: Invalid Memory Type for Bucket.", __FUNCTION__ );
+         break;
       case MEM_INTEGER:
       case MEM_STRING:
          free( (char *)bucket->memory );
@@ -162,6 +204,15 @@ int free_bucket( MEM_BUCKET *bucket )
             FreeList( (LLIST *)bucket->memory );
          break;
       }
+      case MEM_HASH:
+         free_hash( (D_HASH *)bucket->memory );
+         break;
+      case MEM_CHUNK:
+         free_chunk( (LUA_CHUNK *)bucket->memory );
+         break;
+      case MEM_VAR:
+         free_var( (LUA_VAR *)bucket->memory );
+         break;
    }
    bucket->memory = NULL;
    free( bucket );
@@ -181,7 +232,24 @@ int free_buffer( D_BUFFER *buf )
 
    buf->lines = NULL;
    free( buf );
-   return 0;
+   return 1;
+}
+
+int free_chunk( LUA_CHUNK *chunk )
+{
+   chunk->owner = NULL;
+   unassign( chunk->chunk );
+   free( chunk );
+   return 1;
+}
+
+int free_var( LUA_VAR *var )
+{
+   unassign( var->owners );
+   unassign( var->name );
+   unassign( var->script );
+   free( var );
+   return 1;
 }
 
 /* getters */
@@ -218,6 +286,21 @@ size_t get_size( const void *ptr )
    return bucket->mem_size;
 }
 
+/* checkers */
+bool is_reached( const void *ptr )
+{
+   MEM_BUCKET *bucket;
+   ITERATOR Iter;
+
+   AttachIterator( &Iter, memory_management->zero_reach_list );
+   while( ( bucket = (MEM_BUCKET *)NextInList( &Iter ) ) != NULL )
+     if( bucket->memory == ptr )
+        break;
+   DetachIterator( &Iter );
+
+   return bucket ? TRUE : FALSE;
+}
+
 /* utility */
 void reach_ptr( const void *ptr, void **assignment )
 {
@@ -245,7 +328,6 @@ void reach_ptr( const void *ptr, void **assignment )
             LLIST *list = (LLIST *)bucket->memory;
             if( SizeOfList( list ) > 0 )
                reach_list_content( list );
-            list->_reached = 1;
             break;
          }
       }
@@ -280,7 +362,6 @@ void unreach_ptr( const void *ptr, void **assignment )
             LLIST *list = (LLIST *)bucket->memory;
             if( SizeOfList( list ) > 0 )
                unreach_list_content( list );
-            list->_reached = 0;
             break;
          }
       }

@@ -8,7 +8,7 @@ typedef struct memory_manager MEM_MANAGER;
 
 typedef enum
 {
-   MEM_INTEGER, MEM_STRING, MEM_BUFFER, MEM_LIST, MAX_MEM
+   MEM_INTEGER, MEM_STRING, MEM_BUFFER, MEM_LIST, MEM_HASH, MEM_CHUNK, MEM_VAR, MAX_MEM
 } MB_TYPE;
 
 struct memory_bucket
@@ -26,17 +26,22 @@ struct memory_manager
 };
 
 #define assign( ptr, data )		\
+do					\
 {					\
    unreach_ptr( ptr,(void **)&ptr );	\
    ptr = data;				\
    reach_ptr( ptr, (void **)&ptr );	\
-}
+} while(0)
 
 #define unassign( ptr )			\
+do					\
 {					\
    unreach_ptr( ptr, (void **)&ptr );	\
    ptr = NULL;				\
-}
+} while(0)
+
+#define is_reachable( ptr ) get_bucket_for( (ptr) ) ? TRUE : FALSE
+
 #define LINK(link, first, last, next, prev) \
 do                                          \
 {                                           \
@@ -100,7 +105,8 @@ char		*new_string		( const char *fmt, ... );
 char		*str_alloc		( size_t size );
 D_BUFFER	*new_buffer		( int width );
 LLIST		*new_list		( void );
-LUA_CHUNK	*new_chunk		( void );
+D_HASH		*new_hash		( int type, int size );
+LUA_CHUNK	*new_chunk		( int size );
 LUA_VAR		*new_var		( void );
 
 /* destroyers */
@@ -114,6 +120,8 @@ int 		 get_zero_reach_size	( void );
 MEM_BUCKET	*get_bucket_for		( const void *ptr );
 size_t		 get_size		( const void *ptr );
 
+/* checkers */
+bool		 is_reached		( const void *ptr );
 /* utility */
 void 		 reach_ptr		( const void *ptr, void **assignment );
 void 		 unreach_ptr		( const void *ptr, void **assignment );

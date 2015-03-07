@@ -6,10 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "hash.h"
-#include "list.h"
-#include "buffers.h"
-#include "manager.h"
+#include "mud.h"
 
 /* local procedures */
 void  FreeCell        ( CELL *pCell, LLIST *pList );
@@ -26,9 +23,6 @@ LLIST *AllocList()
    pList->_iterators 	= 0;
    pList->_valid 	= 1;
    pList->_size 	= 0;
-   pList->_managed 	= 0;
-   pList->_reached	= 0;
-
   return pList;
 }
 
@@ -93,7 +87,7 @@ void AttachToList(void *pContent, LLIST *pList)
     return;
 
   pCell = AllocCell();
-   if( pList->_managed && pList->_reached )
+   if( get_bucket_for( pList ) && is_reached( pList ) )
    {
       assign( pCell->_pContent, pContent );
    }
@@ -124,7 +118,7 @@ void AttachToEnd( void *pContent, LLIST *pList )
    }
 
    pCell = AllocCell();
-   if( pList->_managed && pList->_reached )
+   if( get_bucket_for( pList ) && is_reached( pList ) )
    {
       assign( pCell->_pContent, pContent );
    }
@@ -166,7 +160,7 @@ void InsertBefore( void *pContent, LLIST *pList, void *bContent )
       return;
 
    pCell = AllocCell();
-   if( pList->_managed && pList->_reached )
+   if( get_bucket_for( pList ) && is_reached( pList ) )
    {
       assign( pCell->_pContent, pContent );
    }
@@ -209,7 +203,7 @@ void InsertAfter( void *pContent, LLIST *pList, void *aContent )
       return;
 
    pCell = AllocCell();
-   if( pList->_managed && pList->_reached )
+   if( get_bucket_for( pList ) && is_reached( pList ) )
    {
       assign( pCell->_pContent, pContent );
    }
@@ -307,7 +301,7 @@ void FreeCell(CELL *pCell, LLIST *pList)
   if (pCell->_pNextCell != NULL)
     pCell->_pNextCell->_pPrevCell = pCell->_pPrevCell;
 
-   if( pList->_managed && pList->_reached )
+   if( get_bucket_for( pList ) && is_reached( pList ) )
    {
       unassign( pCell->_pContent );
    }

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "hash.h"
 
-static inline void attach_bucket( void *to_add, long key, D_HASH *hash, long hash_key );
+static inline HASH_BUCKET *attach_bucket( void *to_add, long key, D_HASH *hash, long hash_key );
 static inline void detach_bucket( HASH_BUCKET *bucket, D_HASH *hash );
 static inline long get_hash_key( D_HASH *hash, long key );
 
@@ -21,35 +21,53 @@ D_HASH *init_hash( int type, int size )
          return NULL;
       case NUMERIC_HASH:
       case ASCII_HASH:
-         hash = (D_HASH *)malloc( sizeof( D_HASH ) );
-         hash->type = type;
-         hash->size = size;
-         hash->array = (HASH_BUCKET **)calloc( size, sizeof( HASH_BUCKET * ) );
-         hash->hash_search = (HASH_BUCKET **)calloc( size, sizeof( HASH_BUCKET * ) );
+         hash 			= (D_HASH *)malloc( sizeof( D_HASH ) );
+         hash->type 		= type;
+         hash->size 		= size;
+         hash->array 		= (HASH_BUCKET **)calloc( size, sizeof( HASH_BUCKET * ) );
+         hash->hash_search 	= (HASH_BUCKET **)calloc( size, sizeof( HASH_BUCKET * ) );
+         hash->count 		= 0;
          break;
    }
    return hash;
 }
 
+void free_hash( D_HASH *hash )
+{
+   HASH_BUCKET *bucket, *bucket_next;
+   int x;
 
-int hash_add( D_HASH *hash, void *to_add, long key )
+   for( x = 0; x < hash->size; x++ )
+   {
+      hash->hash_search[x] = NULL;
+      for( bucket = hash->array[x]; bucket; bucket = bucket_next )
+      {
+         bucket_next = bucket->next;
+         bucket->next = NULL;
+         bucket->data = NULL;
+         free( bucket );
+      }
+   }
+   free( hash );
+}
+
+HASH_BUCKET *hash_add( D_HASH *hash, void *to_add, long key )
 {
    long hash_key;
 
    if( !hash )
    {
       printf( "%s: cannot add to a NULL hash.\r\n", __FUNCTION__ );
-      return 0;
+      return NULL;
    }
    if( !to_add )
    {
       printf( "%s: cannot add NULL data to hash.\r\n", __FUNCTION__ );
-      return 0;
+      return NULL;
    }
    if( ( hash_key = get_hash_key( hash, key ) ) == -1 )
-      return 0;
-   attach_bucket( to_add, key, hash, hash_key );
-   return 1;
+      return NULL;
+   return attach_bucket( to_add, key, hash, hash_key );
 }
 
 int hash_remove( D_HASH *hash, void *to_remove, long key )
@@ -119,7 +137,7 @@ void hash_show( D_HASH *hash )
    }
 }
 
-static inline void attach_bucket( void *to_add, long key, D_HASH *hash, long hash_key )
+static inline HASH_BUCKET *attach_bucket( void *to_add, long key, D_HASH *hash, long hash_key )
 {
    HASH_BUCKET *bucket = init_bucket();
    bucket->data = to_add;
@@ -127,6 +145,8 @@ static inline void attach_bucket( void *to_add, long key, D_HASH *hash, long has
    if( hash->array[hash_key] )
       bucket->next = hash->array[hash_key];
    hash->array[hash_key] = bucket;
+   hash->count++;
+   return bucket;
 }
 
 static inline void detach_bucket( HASH_BUCKET *bucket, D_HASH *hash )
@@ -146,6 +166,7 @@ static inline void detach_bucket( HASH_BUCKET *bucket, D_HASH *hash )
    bucket->next = NULL;
    bucket->data = NULL;
    free( bucket );
+   hash->count--;
 }
 
 
