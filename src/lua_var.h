@@ -16,6 +16,8 @@ struct lua_var_chunk
    VAR_OWNER_TYPE	 type;
    D_HASH 		*chunk;
    int		 	 var_count;
+   void		        *_bucket;
+   int			 _reached;
 };
 
 struct lua_var
@@ -25,6 +27,8 @@ struct lua_var
    long		 data;
    VAR_TYPE	 type;
    char		*script;
+   void		*_bucket;
+   int		 _reached;
 };
 
 /* setters */

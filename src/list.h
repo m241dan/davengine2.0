@@ -21,7 +21,8 @@ typedef struct List
   int    _iterators;
   int    _size;
   int    _valid;
-  char *tester;
+  void  *_bucket;
+  int    _reached;
 } LLIST;
 
 typedef struct Iterator

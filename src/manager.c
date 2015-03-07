@@ -19,19 +19,19 @@ int init_manager( void )
    return 1;
 }
 
-int new_bucket( MB_TYPE type, void *memory, size_t size )
+MEM_BUCKET *new_bucket( MB_TYPE type, void *memory, size_t size )
 {
    MEM_BUCKET *bucket;
 
    if( !memory_management )
    {
       bug( "%s: memory manager not initiliazed.\n", __FUNCTION__ );
-      return 0;
+      return NULL;
    }
    if( !memory )
    {
       bug( "%s: passed NULL memory to save. Returning NULL.\n", __FUNCTION__ );
-      return 0;
+      return NULL;
    }
    bucket 		= malloc( sizeof( MEM_BUCKET ) );
    bucket->memory	= memory;
@@ -39,7 +39,7 @@ int new_bucket( MB_TYPE type, void *memory, size_t size )
    bucket->type		= type;
    bucket->reach	= AllocList();
    AttachToList( bucket, memory_management->zero_reach_list );
-   return 1;
+   return bucket;
 }
 
 /* ints */
@@ -108,9 +108,9 @@ D_BUFFER *new_buffer( int width )
    buf		= malloc( size );
    buf->width 	= width;
    buf->favor 	= BOT_FAVOR;
-   buf->lines 	= new_list();
-
-   new_bucket( MEM_BUFFER, buf, size );
+   buf->lines	= NULL;
+   assign( buf->lines, new_list() );
+   setup_manager( buf, new_bucket( MEM_BUFFER, buf, size ) );
    return buf;
 }
 
@@ -119,7 +119,7 @@ LLIST *new_list( void )
 {
    LLIST *list;
    list 		= AllocList();
-   new_bucket( MEM_LIST, list, sizeof( LLIST ) );
+   setup_manager( list, new_bucket( MEM_LIST, list, sizeof( LLIST ) ) );
    return list;
 }
 
@@ -127,7 +127,7 @@ D_HASH *new_hash( int type, int size )
 {
    D_HASH *hash;
    hash		= init_hash( type, size );
-   new_bucket( MEM_HASH, hash, sizeof( D_HASH ) );
+   setup_manager( hash, new_bucket( MEM_HASH, hash, sizeof( D_HASH ) ) );
    return hash;
 }
 
@@ -141,11 +141,12 @@ LUA_CHUNK *new_chunk( int size )
       return NULL;
    }
    chunk 		= malloc( sizeof( LUA_CHUNK ) );
-   assign( chunk->chunk, new_hash( ASCII_HASH, size ) );
+   chunk->chunk		= NULL;
    chunk->owner		= NULL;
    chunk->type		= VOT_UNOWNED;
    chunk->var_count	= 0;
-   new_bucket( MEM_CHUNK, chunk, sizeof( LUA_CHUNK ) );
+   assign( chunk->chunk, new_hash( ASCII_HASH, size ) );
+   setup_manager( chunk, new_bucket( MEM_CHUNK, chunk, sizeof( LUA_CHUNK ) ) );
    return chunk;
 }
 
@@ -154,12 +155,13 @@ LUA_VAR *new_var( void )
    LUA_VAR *var;
 
    var 		= malloc( sizeof( LUA_VAR ) );
-   assign( var->owners, new_list() );
+   var->owners	= NULL;
    var->name	= NULL;
    var->data	= 0;
    var->type	= TYPE_UNSET;
    var->script	= NULL;
-   new_bucket( MEM_VAR, var, sizeof( LUA_VAR ) );
+   assign( var->owners, new_list() );
+   setup_manager( var, new_bucket( MEM_VAR, var, sizeof( LUA_VAR ) ) );
    return var;
 }
 
@@ -221,16 +223,8 @@ int free_bucket( MEM_BUCKET *bucket )
 
 int free_buffer( D_BUFFER *buf )
 {
-   char *line;
-   ITERATOR Iter;
-
-   /* have to do a manual clear out here to make sure detachfromlist is called and memory manager is satisfied */
-   AttachIterator( &Iter, buf->lines );
-   while( ( line = (char *)NextInList( &Iter ) ) != NULL )
-      DetachFromList( line, buf->lines );
-   DetachIterator( &Iter );
-
-   buf->lines = NULL;
+   unassign( buf->lines );
+   buf->_bucket = NULL;
    free( buf );
    return 1;
 }
@@ -239,6 +233,7 @@ int free_chunk( LUA_CHUNK *chunk )
 {
    chunk->owner = NULL;
    unassign( chunk->chunk );
+   chunk->_bucket = NULL;
    free( chunk );
    return 1;
 }
@@ -248,6 +243,7 @@ int free_var( LUA_VAR *var )
    unassign( var->owners );
    unassign( var->name );
    unassign( var->script );
+   var->_bucket = NULL;
    free( var );
    return 1;
 }
@@ -286,21 +282,6 @@ size_t get_size( const void *ptr )
    return bucket->mem_size;
 }
 
-/* checkers */
-bool is_reached( const void *ptr )
-{
-   MEM_BUCKET *bucket;
-   ITERATOR Iter;
-
-   AttachIterator( &Iter, memory_management->zero_reach_list );
-   while( ( bucket = (MEM_BUCKET *)NextInList( &Iter ) ) != NULL )
-     if( bucket->memory == ptr )
-        break;
-   DetachIterator( &Iter );
-
-   return bucket ? TRUE : FALSE;
-}
-
 /* utility */
 void reach_ptr( const void *ptr, void **assignment )
 {
@@ -318,18 +299,30 @@ void reach_ptr( const void *ptr, void **assignment )
       {
          default: break;
          case MEM_BUFFER:
-         {
-            D_BUFFER *buf = (D_BUFFER *)bucket->memory;
-            reach_ptr( buf->lines, (void **)&buf->lines );
+            ((D_BUFFER *)bucket->memory)->_reached = 1;
             break;
-         }
          case MEM_LIST:
          {
             LLIST *list = (LLIST *)bucket->memory;
             if( SizeOfList( list ) > 0 )
                reach_list_content( list );
+            list->_reached = 1;
             break;
          }
+         case MEM_HASH:
+         {
+            D_HASH *hash = (D_HASH *)bucket->memory;
+            if( hash->count > 0 )
+               reach_hash_content( hash );
+            hash->_reached = 1;
+            break;
+         }
+         case MEM_CHUNK:
+            ((LUA_CHUNK *)bucket->memory)->_reached = 1;
+            break;
+         case MEM_VAR:
+            ((LUA_VAR *)bucket->memory)->_reached = 1;
+            break;
       }
    }
    AttachToList( assignment, bucket->reach );
@@ -352,18 +345,29 @@ void unreach_ptr( const void *ptr, void **assignment )
       {
          default: break;
          case MEM_BUFFER:
-         {
-            D_BUFFER *buf = (D_BUFFER *)bucket->memory;
-            unreach_ptr( buf->lines, (void **)&buf->lines );
+            ((D_BUFFER *)bucket->memory)->_reached = 0;
             break;
-         }
          case MEM_LIST:
          {
             LLIST *list = (LLIST *)bucket->memory;
             if( SizeOfList( list ) > 0 )
                unreach_list_content( list );
+            list->_reached = 0;
             break;
          }
+         case MEM_HASH:
+         {
+            D_HASH *hash = (D_HASH *)bucket->memory;
+            if( hash->count > 0 )
+               unreach_hash_content( hash );
+            hash->_reached = 0;
+         }
+         case MEM_CHUNK:
+            ((LUA_CHUNK *)bucket->memory)->_reached = 0;
+            break;
+         case MEM_VAR:
+            ((LUA_VAR *)bucket->memory)->_reached = 0;
+            break;
       }
    }
    DetachFromList( assignment, bucket->reach );
@@ -379,7 +383,6 @@ void reach_list_content( LLIST *list )
    {
       AttachIterator( &Iter, list );
       while( ( cell_ptr = NextCellInList( &Iter ) ) != NULL )
-      /* do it manually here instead of using the macro to avoid funky interactions */
          reach_ptr( cell_ptr->_pContent, (void **)&cell_ptr->_pContent );
       DetachIterator( &Iter );
    }
@@ -394,10 +397,31 @@ void unreach_list_content( LLIST *list )
    {
       AttachIterator( &Iter, list );
       while( ( cell_ptr = NextCellInList( &Iter ) ) != NULL )
-      {
-         unassign( cell_ptr->_pContent );
-      }
+         unreach_ptr( cell_ptr->_pContent, (void **)&cell_ptr->_pContent );
       DetachIterator( &Iter );
+   }
+}
+
+void reach_hash_content( D_HASH *hash )
+{
+   HASH_BUCKET *bucket;
+   int x;
+
+   for( x = 0; x < hash->size; x++ )
+   {
+      for( bucket = hash->array[x]; bucket; bucket = bucket->next )
+         reach_ptr( bucket->data, (void **)&bucket->data );
+   }
+}
+
+void unreach_hash_content( D_HASH *hash )
+{
+   HASH_BUCKET *bucket;
+   int x;
+   for( x = 0; x < hash->size; x++ )
+   {
+      for( bucket = hash->array[x]; bucket; bucket = bucket->next )
+         unreach_ptr( bucket->data, (void **)&bucket->data );
    }
 }
 

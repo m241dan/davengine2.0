@@ -22,6 +22,8 @@ struct d_hash
    HASH_BUCKET **hash_search;
    HASH_BUCKET **array;
    long int	 count;
+   void	       *_bucket;
+   int		_reached;
 };
 
 #define init_bucket() (HASH_BUCKET *)calloc( 1, sizeof( HASH_BUCKET ) )

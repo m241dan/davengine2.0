@@ -63,5 +63,4 @@ void buffer_basics_test2( void )
    set_favor( buf[1], TOP_FAVOR );
    set_favor( buf[2], MID_FAVOR );
    bug( "%s: Does this look right?\r\n\r\n%s\r\n.", __FUNCTION__, buffers_to_string( buf, 3 ) );
-   
 }

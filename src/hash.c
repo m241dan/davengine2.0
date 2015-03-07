@@ -27,12 +27,14 @@ D_HASH *init_hash( int type, int size )
          hash->array 		= (HASH_BUCKET **)calloc( size, sizeof( HASH_BUCKET * ) );
          hash->hash_search 	= (HASH_BUCKET **)calloc( size, sizeof( HASH_BUCKET * ) );
          hash->count 		= 0;
+         hash->_bucket		= NULL;
+         hash->_reached		= 0;
          break;
    }
    return hash;
 }
 
-void free_hash( D_HASH *hash )
+int free_hash( D_HASH *hash )
 {
    HASH_BUCKET *bucket, *bucket_next;
    int x;
@@ -48,7 +50,9 @@ void free_hash( D_HASH *hash )
          free( bucket );
       }
    }
+   hash->_bucket = NULL;
    free( hash );
+   return 1;
 }
 
 HASH_BUCKET *hash_add( D_HASH *hash, void *to_add, long key )

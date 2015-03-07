@@ -23,7 +23,9 @@ LLIST *AllocList()
    pList->_iterators 	= 0;
    pList->_valid 	= 1;
    pList->_size 	= 0;
-  return pList;
+   pList->_bucket	= NULL;
+   pList->_reached	= 0;
+   return pList;
 }
 
 void AttachIterator(ITERATOR *pIter, LLIST *pList)
@@ -87,7 +89,7 @@ void AttachToList(void *pContent, LLIST *pList)
     return;
 
   pCell = AllocCell();
-   if( get_bucket_for( pList ) && is_reached( pList ) )
+   if( is_reachable( pList ) && is_reached( pList ) )
    {
       assign( pCell->_pContent, pContent );
    }
@@ -118,10 +120,8 @@ void AttachToEnd( void *pContent, LLIST *pList )
    }
 
    pCell = AllocCell();
-   if( get_bucket_for( pList ) && is_reached( pList ) )
-   {
+   if( is_reachable( pList ) && is_reached( pList ) )
       assign( pCell->_pContent, pContent );
-   }
    else
       pCell->_pContent = pContent;
    pCell->_pPrevCell = pList->_pLastCell;
@@ -160,7 +160,7 @@ void InsertBefore( void *pContent, LLIST *pList, void *bContent )
       return;
 
    pCell = AllocCell();
-   if( get_bucket_for( pList ) && is_reached( pList ) )
+   if( is_reachable( pList ) && is_reached( pList ) )
    {
       assign( pCell->_pContent, pContent );
    }
@@ -203,7 +203,7 @@ void InsertAfter( void *pContent, LLIST *pList, void *aContent )
       return;
 
    pCell = AllocCell();
-   if( get_bucket_for( pList ) && is_reached( pList ) )
+   if( is_reachable( pList ) && is_reached( pList ) )
    {
       assign( pCell->_pContent, pContent );
    }
@@ -283,7 +283,7 @@ void FreeList(LLIST *pList)
 
     FreeCell(pCell, pList);
   }
-
+   pList->_bucket = NULL;
   free(pList);
 }
 
@@ -301,7 +301,7 @@ void FreeCell(CELL *pCell, LLIST *pList)
   if (pCell->_pNextCell != NULL)
     pCell->_pNextCell->_pPrevCell = pCell->_pPrevCell;
 
-   if( get_bucket_for( pList ) && is_reached( pList ) )
+   if( is_reachable( pList ) && is_reached( pList ) )
    {
       unassign( pCell->_pContent );
    }
@@ -336,7 +336,7 @@ void *NextInList(ITERATOR *pIter)
 
 CELL *NextCellInList( ITERATOR *pIter )
 {
-   CELL *pCell;
+   CELL *pCell = NULL;
    while( pIter->_pCell != NULL && !pIter->_pCell->_valid )
    {
       pIter->_pCell = pIter->_pCell->_pNextCell;

@@ -1,7 +1,7 @@
 /* This is the header file for the memory management library written by Davenge */
 
-typedef struct memory_bucket MEM_BUCKET;
-typedef struct memory_manager MEM_MANAGER;
+typedef struct memory_bucket 	MEM_BUCKET;
+typedef struct memory_manager 	MEM_MANAGER;
 
 #define MANAGER_SIZE 1001
 #define STRING_PADDING 101
@@ -25,22 +25,27 @@ struct memory_manager
    D_HASH 	*reach_list;
 };
 
-#define assign( ptr, data )		\
-do					\
-{					\
-   unreach_ptr( ptr,(void **)&ptr );	\
-   ptr = data;				\
-   reach_ptr( ptr, (void **)&ptr );	\
+#define setup_manager( ptr, bucket ) 	\
+do {					\
+   (ptr)->_bucket = (bucket);		\
+   (ptr)->_reached = 0;			\
 } while(0)
 
-#define unassign( ptr )			\
-do					\
-{					\
-   unreach_ptr( ptr, (void **)&ptr );	\
-   ptr = NULL;				\
+#define assign( ptr, data )			\
+do {						\
+   unreach_ptr( (ptr),(void **)&(ptr) );	\
+   (ptr) = (data);				\
+   reach_ptr( (ptr), (void **)&(ptr) );		\
 } while(0)
 
-#define is_reachable( ptr ) get_bucket_for( (ptr) ) ? TRUE : FALSE
+#define unassign( ptr )				\
+do {						\
+   unreach_ptr( (ptr), (void **)&(ptr) );	\
+   ptr = NULL;					\
+} while(0)
+
+#define is_reachable( data ) (data)->_bucket ? TRUE : FALSE
+#define is_reached( data )  (data)->_reached ? TRUE : FALSE
 
 #define LINK(link, first, last, next, prev) \
 do                                          \
@@ -99,7 +104,7 @@ do                                              \
 
 /* creators */
 int		 init_manager		( void );
-int		 new_bucket		( MB_TYPE type, void *memory, size_t size );
+MEM_BUCKET	* new_bucket		( MB_TYPE type, void *memory, size_t size );
 int 		*new_integer		( int num );
 char		*new_string		( const char *fmt, ... );
 char		*str_alloc		( size_t size );
@@ -120,14 +125,14 @@ int 		 get_zero_reach_size	( void );
 MEM_BUCKET	*get_bucket_for		( const void *ptr );
 size_t		 get_size		( const void *ptr );
 
-/* checkers */
-bool		 is_reached		( const void *ptr );
 /* utility */
 void 		 reach_ptr		( const void *ptr, void **assignment );
 void 		 unreach_ptr		( const void *ptr, void **assignment );
 void		 reach_list_content	( LLIST *list );
 void		 unreach_list_content	( LLIST *list );
-
+void		 reach_hash_content	( D_HASH *hash );
+void		 unreach_hash_content	( D_HASH *hash );
 /* monitor */
 void 		 clear_zero_reach	( void );
+
 

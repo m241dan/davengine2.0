@@ -11,6 +11,8 @@ struct mud_buffer
    int		 width;
    LLIST	*lines;
    BUFFER_FAVOR	 favor;
+   void		*_bucket;
+   int		 _reached;
 };
 
 #define create_buffer( buf, width, input )			\
