@@ -79,6 +79,7 @@ int main(int argc, char **argv)
       copy_string_fl_test();
       buffer_basics_test();
       buffer_basics_test2();
+      lua_chunk_test();
    }
 
    /* note that we are booting up */

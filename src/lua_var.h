@@ -42,3 +42,6 @@ bool	 set_var_to_int		( LUA_VAR *var, long int value );
 
 /* getters */
 LUA_VAR	*get_var_from_chunk	( LUA_CHUNK *chunk, char *name );
+char	*get_var_string		( LUA_VAR *var );
+int	 get_var_int		( LUA_VAR *var );
+long	 get_var_long		( LUA_VAR *var );

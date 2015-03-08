@@ -64,3 +64,57 @@ void buffer_basics_test2( void )
    set_favor( buf[2], MID_FAVOR );
    bug( "%s: Does this look right?\r\n\r\n%s\r\n.", __FUNCTION__, buffers_to_string( buf, 3 ) );
 }
+
+void lua_chunk_test( void )
+{
+   LUA_CHUNK *chunk;
+   LUA_VAR *var;
+
+   chunk = new_chunk( 52 );
+
+   var = new_var();
+   set_var_name( var, "Davenge" );
+   set_var_to_string( var, new_string( "is awesome" ) );
+   set_var_to_chunk( var, chunk );
+
+   var = new_var();
+   set_var_name( var, "Davenge2" );
+   set_var_to_int( var, 28 );
+   set_var_to_chunk( var, chunk );
+
+   var = new_var();
+   set_var_name( var, "davenge3" );
+   set_var_to_int( var, 27 );
+   set_var_to_chunk( var, chunk );
+
+   var = new_var();
+   set_var_name( var, "random" );
+   set_var_to_string( var, new_string( "this is definitely random" ) );
+   set_var_to_chunk( var, chunk );
+
+   if( ( var = get_var_from_chunk( chunk, "Davenge" ) ) == NULL )
+      bug( "%s: part 1 failed.", __FUNCTION__ );
+   else
+      bug( "%s: should be 'is awesome': %s", __FUNCTION__, get_var_string( var ) );
+
+
+   if( ( var = get_var_from_chunk( chunk, "Davenge2" ) ) == NULL )
+      bug( "%s: part 2 failed.", __FUNCTION__ );
+   else
+      bug( "%s: should be '28': %d", __FUNCTION__, get_var_int( var ) );
+
+   if( ( var = get_var_from_chunk( chunk, "davenge3" ) ) == NULL )
+      bug( "%s: part 3 failed.", __FUNCTION__ );
+   else
+      bug( "%s: should be '27': %d", __FUNCTION__, get_var_long( var ) );
+
+   if( ( var = get_var_from_chunk( chunk, "random" ) ) == NULL )
+      bug( "%s: part 4 failed.", __FUNCTION__ );
+   else
+      bug( "%s: should be 'this is definitely random': %s", __FUNCTION__, get_var_string( var ) );
+
+   if( ( var = get_var_from_chunk( chunk, "anything" ) ) != NULL )
+      bug( "%s: part 4 failed.", __FUNCTION__ );
+   else
+      bug( "%s: part 5 success.", __FUNCTION__ );
+}

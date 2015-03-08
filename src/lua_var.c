@@ -63,7 +63,7 @@ bool set_var_name(LUA_VAR *var, char *name )
          hash_remove( chunk->chunk, var, (long)var->name );
       DetachIterator( &Iter );
    }
-   assign( var->name, name );
+   assign( var->name, new_string( name ) );
    if( SizeOfList( var->owners ) > 0 )
    {
       AttachIterator( &Iter, var->owners );
@@ -84,6 +84,11 @@ bool set_var_script( LUA_VAR *var, char *path )
 
 bool set_var_to_string( LUA_VAR *var, char *string )
 {
+   if( get_bucket_for( string ) == NULL )
+   {
+      bug( "%s: cannot add unmanged string to var.", __FUNCTION__ );
+      return FALSE;
+   }
    if( var->type != TYPE_INT && var->type != TYPE_UNSET )
       unreach_ptr( (void *)var->data, (void **)&var->data );
    var->type = TYPE_STRING;
@@ -97,6 +102,7 @@ bool set_var_to_int( LUA_VAR *var, long int value )
 {
    if( var->type != TYPE_INT && var->type != TYPE_UNSET )
       unreach_ptr( (void *)var->data, (void **)&var->data );
+   var->type = TYPE_INT;
    var->data = value;
    /* sql stuff */
    return TRUE;
@@ -105,19 +111,49 @@ bool set_var_to_int( LUA_VAR *var, long int value )
 /* getters */
 LUA_VAR *get_var_from_chunk( LUA_CHUNK *chunk, char *name )
 {
-   MEM_BUCKET *mbucket;
    HASH_BUCKET *bucket;
    LUA_VAR *var;
 
    if( ( bucket = hash_find( chunk->chunk, (long)name ) ) == NULL )
       return NULL;
-
    do
    {
-      mbucket = (MEM_BUCKET *)bucket->data;
-      var = (LUA_VAR *)mbucket->memory;
+      var = (LUA_VAR *)bucket->data;
       if( !strcmp( var->name, name ) )
+      {
+         printf( "found\r\n" );
          break;
+      }
    } while( ( var = NULL ) && ( bucket = hash_find_next( chunk->chunk, (long)name ) ) != NULL );
    return var;
+}
+
+char *get_var_string( LUA_VAR *var )
+{
+   if( var->type != TYPE_STRING )
+   {
+      bug( "%s: var not of type string.", __FUNCTION__ );
+      return NULL;
+   }
+   return ((char *)var->data );
+}
+
+int get_var_int( LUA_VAR *var )
+{
+   if( var->type != TYPE_INT )
+   {
+      bug( "%s: var not of type int.", __FUNCTION__ );
+      return 0;
+   }
+   return ((int)var->data );
+}
+
+long get_var_long( LUA_VAR *var )
+{
+   if( var->type != TYPE_INT )
+   {
+      bug( "%s: var not of typeint.", __FUNCTION__ );
+      return 0;
+   }
+   return var->data;
 }

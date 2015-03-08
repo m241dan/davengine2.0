@@ -278,7 +278,7 @@ bool    is_prefix             ( const char *aStr, const char *bStr );
 char   *smash_color	      ( const char *str );
 int	color_count	      ( const char *str );
 int	find_real_length      ( const char *str, int goal );
-char   *copy_string_fl	      ( const char *str, int length );
+char   *copy_string_fl	      ( const char *orig, int length );
 char   *create_pattern	      ( const char *pattern, int width );
 /*
  * help.c

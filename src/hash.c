@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "hash.h"
 
 static inline HASH_BUCKET *attach_bucket( void *to_add, long key, D_HASH *hash, long hash_key );
@@ -100,8 +101,20 @@ HASH_BUCKET *__hash_find( D_HASH *hash, long key, int reset )
       hash->hash_search[hash_key] = hash->hash_search[hash_key]->next;
 
    for( ; hash->hash_search[hash_key]; hash->hash_search[hash_key] = hash->hash_search[hash_key]->next  )
-      if( hash->hash_search[hash_key]->key == key )
-         return hash->hash_search[hash_key];
+   {
+      switch( hash->type )
+      {
+         default: printf( "%s: unknown hash type.\r\n", __FUNCTION__ ); break;
+         case NUMERIC_HASH:
+            if( hash->hash_search[hash_key]->key == key )
+               return hash->hash_search[hash_key];
+            break;
+         case ASCII_HASH:
+            if( !strcmp( (char *)hash->hash_search[hash_key]->key, (char *)key ) )
+               return hash->hash_search[hash_key];
+            break;
+      }
+   }
    return NULL;
 }
 

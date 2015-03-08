@@ -104,7 +104,7 @@ do                                              \
 
 /* creators */
 int		 init_manager		( void );
-MEM_BUCKET	* new_bucket		( MB_TYPE type, void *memory, size_t size );
+MEM_BUCKET	*new_bucket		( MB_TYPE type, void *memory, size_t size );
 int 		*new_integer		( int num );
 char		*new_string		( const char *fmt, ... );
 char		*str_alloc		( size_t size );
