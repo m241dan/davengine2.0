@@ -75,10 +75,10 @@ int main(int argc, char **argv)
 
    if( run_tests )
    {
-      find_real_length_test();
+/*      find_real_length_test();
       copy_string_fl_test();
       buffer_basics_test();
-      buffer_basics_test2();
+      buffer_basics_test2(); */
       lua_chunk_test();
    }
 

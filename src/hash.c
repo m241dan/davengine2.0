@@ -51,6 +51,8 @@ int free_hash( D_HASH *hash )
          free( bucket );
       }
    }
+   free( hash->array );
+   free( hash->hash_search );
    hash->_bucket = NULL;
    free( hash );
    return 1;

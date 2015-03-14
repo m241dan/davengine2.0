@@ -9,6 +9,8 @@
 
 MEM_MANAGER *memory_management = NULL;
 
+int string_mem = 0;
+
 /* creators */
 
 int init_manager( void )
@@ -86,6 +88,9 @@ char *new_string( const char *fmt, ... )
    length = vsnprintf( ptr, size , fmt, va );
    va_end( va );
 
+   string_mem += (int)size;
+
+   printf( "%s: string %s size is %d.\r\n", __FUNCTION__, ptr, string_mem );
    new_bucket( MEM_STRING, ptr, size );
    return ptr;
 }
@@ -94,6 +99,8 @@ char *str_alloc( size_t size )
 {
    char *ptr = calloc( sizeof( char ), size );
    ptr[0] = '\0';
+   string_mem += (int)size;
+   printf( "%s: string %s size is %d.\r\n", __FUNCTION__, ptr, string_mem );
    new_bucket( MEM_STRING, ptr, size );
    return ptr;
 }
@@ -192,14 +199,19 @@ int free_bucket( MEM_BUCKET *bucket )
          break;
       case MEM_INTEGER:
       case MEM_STRING:
+         printf( "%s: freeing string %s or integer\r\n", __FUNCTION__, (char *)bucket->memory );
+         string_mem -= (int)bucket->mem_size;
+         printf( "%s: current string mem left allocated = %d.\r\n", __FUNCTION__, string_mem );
          free( (char *)bucket->memory );
          break;
       case MEM_BUFFER:
+         printf( "%s: freeing a buffer\r\n", __FUNCTION__ );
          free_buffer( (D_BUFFER *)bucket->memory );
          break;
       case MEM_LIST:
       {
          LLIST *list = (LLIST *)bucket->memory;
+         printf( "%s: freeing a list\r\n", __FUNCTION__ );
          if( list->_iterators > 0 )
             bug( "%s: cannot free, list has unattached iterators.", __FUNCTION__ );
          else
@@ -207,12 +219,15 @@ int free_bucket( MEM_BUCKET *bucket )
          break;
       }
       case MEM_HASH:
+         printf( "%s: freeing a hash\r\n", __FUNCTION__ );
          free_hash( (D_HASH *)bucket->memory );
          break;
       case MEM_CHUNK:
+         printf( "%s: freeing a chunk\r\n", __FUNCTION__ );
          free_chunk( (LUA_CHUNK *)bucket->memory );
          break;
       case MEM_VAR:
+         printf( "%s: freeing a var\r\n", __FUNCTION__ );
          free_var( (LUA_VAR *)bucket->memory );
          break;
    }
@@ -243,6 +258,7 @@ int free_var( LUA_VAR *var )
    unassign( var->owners );
    unassign( var->name );
    unassign( var->script );
+   unreach_ptr( (void *)var->data, (void **)&var->data );
    var->_bucket = NULL;
    free( var );
    return 1;
@@ -303,6 +319,7 @@ void reach_ptr( const void *ptr, void **assignment )
             break;
          case MEM_LIST:
          {
+            printf( "%s: assigning list.\r\n", __FUNCTION__ );
             LLIST *list = (LLIST *)bucket->memory;
             if( SizeOfList( list ) > 0 )
                reach_list_content( list );
@@ -311,6 +328,7 @@ void reach_ptr( const void *ptr, void **assignment )
          }
          case MEM_HASH:
          {
+            printf( "%s: assigning hash.\r\n", __FUNCTION__ );
             D_HASH *hash = (D_HASH *)bucket->memory;
             if( hash->count > 0 )
                reach_hash_content( hash );
