@@ -120,10 +120,7 @@ LUA_VAR *get_var_from_chunk( LUA_CHUNK *chunk, char *name )
    {
       var = (LUA_VAR *)bucket->data;
       if( !strcmp( var->name, name ) )
-      {
-         printf( "found\r\n" );
          break;
-      }
    } while( ( var = NULL ) && ( bucket = hash_find_next( chunk->chunk, (long)name ) ) != NULL );
    return var;
 }
