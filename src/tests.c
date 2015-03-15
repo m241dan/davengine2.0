@@ -118,3 +118,22 @@ void lua_chunk_test( void )
    else
       bug( "%s: part 5 success.", __FUNCTION__ );
 }
+
+void mudcat_test( void )
+{
+   char *strings[4];
+   int x;
+
+   assign( strings[0], new_string( "Tester\r\n" ) );
+   assign( strings[1], strings[0] );
+   assign( strings[2], strings[0] );
+   assign( strings[3], strings[0] );
+
+   mudcat( strings[3], "This is a test of basic mudcat, no realloc.\r\n" );
+   for( x = 0; x < 4; x++ )
+      printf( "String %d is '%s'\r\n", x+1, strings[x] );
+
+   mudcat( strings[2], "Now I need to make sure I write enough garbage here so that it has to realloc the string. To do that, I need to make sure this is definitely over 101 extra characters. I'm pretty sure it is.\r\n" );
+   for( x = 0; x < 4; x++ )
+      printf( "String %d is '%s'\r\n", x+1, strings[x] );
+}

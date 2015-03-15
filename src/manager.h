@@ -132,6 +132,7 @@ void		 reach_list_content	( LLIST *list );
 void		 unreach_list_content	( LLIST *list );
 void		 reach_hash_content	( D_HASH *hash );
 void		 unreach_hash_content	( D_HASH *hash );
+int		 reassign_native	( MEM_BUCKET *bucket, void *ptr, size_t size ); /* for use on native C datatypes only */
 /* monitor */
 void 		 clear_zero_reach	( void );
 

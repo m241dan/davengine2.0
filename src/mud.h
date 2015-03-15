@@ -280,6 +280,7 @@ int	color_count	      ( const char *str );
 int	find_real_length      ( const char *str, int goal );
 char   *copy_string_fl	      ( const char *orig, int length );
 char   *create_pattern	      ( const char *pattern, int width );
+int	mudcat		      ( char *dst, const char *cat ); /* for use with managed strings only */
 /*
  * help.c
  */

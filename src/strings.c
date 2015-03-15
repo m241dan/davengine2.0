@@ -220,3 +220,27 @@ char *create_pattern( const char *pattern, int width )
    buf[width * strlen( pattern )] = '\0';
    return buf;
 }
+
+int mudcat( char *dst, const char *cat )
+{
+   MEM_BUCKET *bucket;
+   char *realloc_string;
+   int cat_size, dst_size;
+
+   if( ( bucket = get_bucket_for( dst ) ) == NULL )
+   {
+      bug( "%s: attempting to cat on a non-managed string: %s", __FUNCTION__, dst );
+      return 0;
+   }
+
+   cat_size = strlen( cat );
+   dst_size = strlen( dst );
+   if( ( cat_size + dst_size ) >= ( bucket->mem_size - 1 ) )
+   {
+      realloc_string = new_string( "%s%s", dst, cat );
+      reassign_native( bucket, realloc_string, get_size( realloc_string ) );
+      return strlen( realloc_string );
+   }
+   strcat( dst, cat );
+   return strlen( dst );
+}

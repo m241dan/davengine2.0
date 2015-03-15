@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-
+#include <string.h>
 #include "mud.h"
 
 MEM_MANAGER *memory_management = NULL;
@@ -424,6 +424,22 @@ void unreach_hash_content( D_HASH *hash )
       for( bucket = hash->array[x]; bucket; bucket = bucket->next )
          unreach_ptr( bucket->data, (void **)&bucket->data );
    }
+}
+
+int reassign_native( MEM_BUCKET *bucket, void *ptr, size_t size )
+{
+   void **reacher;
+   ITERATOR Iter;
+
+   free( bucket->memory );
+   bucket->memory = malloc( size );
+   memcpy( bucket->memory, ptr, size );
+
+   AttachIterator( &Iter, bucket->reach );
+   while( ( reacher = (void **)NextInList( &Iter ) ) != NULL )
+      *reacher = ptr;
+   DetachIterator( &Iter );
+   return 1;
 }
 
 /* monitor */
