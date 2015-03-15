@@ -460,7 +460,6 @@ void close_socket(D_SOCKET *dsock, bool reconnect)
 bool read_from_socket(D_SOCKET *dsock)
 {
    char temp[MAX_BUFFER];
-   int size = strlen( dsock->inbuf );
   extern int errno;
 
   /* check for buffer overflows, and drop connection in that case */
@@ -477,21 +476,22 @@ bool read_from_socket(D_SOCKET *dsock)
       int sInput;
       memset( &temp[0], 0, sizeof( temp ) );
       /* we'll take chunks of MAX_BUFFER size per read */
-      sInput = read(dsock->control, dsock->inbuf + size, MAX_BUFFER );
+      sInput = read( dsock->control, temp, MAX_BUFFER );
 
       if (sInput > 0)
       {
-         size += sInput;
-
-        if (dsock->inbuf[size-1] == '\n' || dsock->inbuf[size-1] == '\r')
-           break;
+         if (temp[sInput-1] == '\n' || temp[sInput-1] == '\r')
+         {
+            mudcat( dsock->inbuf, temp );
+            break;
+         }
       }
       else if (sInput == 0)
       {
          log_string("Read_from_socket: EOF");
          return FALSE;
       }
-      else if (errno == EAGAIN || sInput == wanted)
+      else if (errno == EAGAIN || sInput == MAX_BUFFER )
          break;
       else
       {
@@ -499,7 +499,7 @@ bool read_from_socket(D_SOCKET *dsock)
          return FALSE;
       }
    }
-   dsock->inbuf[size] = '\0';
+/*   dsock->inbuf[size] = '\0'; mudcat and new_string automatically null terminate, not needed -Davenge */
    return TRUE;
 }
 
@@ -1093,7 +1093,7 @@ void clear_socket(D_SOCKET *sock_new, int sock)
   sock_new->player         =  NULL;
   sock_new->top_output     =  0;
   sock_new->events         =  AllocList();
-   assign( socket_new->inbuf, str_alloc( MAX_BUFFER ) );
+   assign( sock_new->inbuf, str_alloc( MAX_BUFFER ) );
 }
 
 /* does the lookup, changes the hostname, and dies */
