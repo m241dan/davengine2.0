@@ -459,47 +459,48 @@ void close_socket(D_SOCKET *dsock, bool reconnect)
  */
 bool read_from_socket(D_SOCKET *dsock)
 {
-  int size;
+   char temp[MAX_BUFFER];
+   int size = strlen( dsock->inbuf );
   extern int errno;
 
   /* check for buffer overflows, and drop connection in that case */
-  size = strlen(dsock->inbuf);
+/*  size = strlen(dsock->inbuf);
   if (size >= sizeof(dsock->inbuf) - 2)
   {
     text_to_socket(dsock, "\n\r!!!! Input Overflow !!!!\n\r");
     return FALSE;
-  }
+  } now an unnecessary check - Davenge */
 
   /* start reading from the socket */
-  for (;;)
-  {
-    int sInput;
-    int wanted = sizeof(dsock->inbuf) - 2 - size;
+   for (;;)
+   {
+      int sInput;
+      memset( &temp[0], 0, sizeof( temp ) );
+      /* we'll take chunks of MAX_BUFFER size per read */
+      sInput = read(dsock->control, dsock->inbuf + size, MAX_BUFFER );
 
-    sInput = read(dsock->control, dsock->inbuf + size, wanted);
+      if (sInput > 0)
+      {
+         size += sInput;
 
-    if (sInput > 0)
-    {
-      size += sInput;
-
-      if (dsock->inbuf[size-1] == '\n' || dsock->inbuf[size-1] == '\r')
-        break;
-    }
-    else if (sInput == 0)
-    {
-      log_string("Read_from_socket: EOF");
-      return FALSE;
-    }
-    else if (errno == EAGAIN || sInput == wanted)
-      break;
-    else
-    {
-      perror("Read_from_socket");
-      return FALSE;
-    }
-  }
-  dsock->inbuf[size] = '\0';
-  return TRUE;
+        if (dsock->inbuf[size-1] == '\n' || dsock->inbuf[size-1] == '\r')
+           break;
+      }
+      else if (sInput == 0)
+      {
+         log_string("Read_from_socket: EOF");
+         return FALSE;
+      }
+      else if (errno == EAGAIN || sInput == wanted)
+         break;
+      else
+      {
+         perror("Read_from_socket");
+         return FALSE;
+      }
+   }
+   dsock->inbuf[size] = '\0';
+   return TRUE;
 }
 
 /*
@@ -1092,6 +1093,7 @@ void clear_socket(D_SOCKET *sock_new, int sock)
   sock_new->player         =  NULL;
   sock_new->top_output     =  0;
   sock_new->events         =  AllocList();
+   assign( socket_new->inbuf, str_alloc( MAX_BUFFER ) );
 }
 
 /* does the lookup, changes the hostname, and dies */

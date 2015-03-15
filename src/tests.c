@@ -124,6 +124,9 @@ void mudcat_test( void )
    char *strings[4];
    int x;
 
+   for( x = 0; x < 4; x++ )
+      strings[x] = NULL;
+
    assign( strings[0], new_string( "Tester\r\n" ) );
    assign( strings[1], strings[0] );
    assign( strings[2], strings[0] );

@@ -33,7 +33,7 @@
 #define eBOLD   1
 
 /* A few globals */
-#define MAX_BUFFER         1024                   /* seems like a decent amount         */
+#define MAX_BUFFER         4096                   /* seems like a decent amount         */
 #define MAX_OUTPUT         2048                   /* well shoot me if it isn't enough   */
 #define MAX_HELP_ENTRY     4096                   /* roughly 40 lines of blocktext      */
 #define FILE_TERMINATOR    "EOF"                  /* end of file marker                 */
@@ -122,7 +122,7 @@ struct dSocket
   D_MOBILE      * player;
   LLIST         * events;
   char          * hostname;
-  char            inbuf[MAX_BUFFER];
+  char          * inbuf;
   char            outbuf[MAX_OUTPUT];
   char            next_command[MAX_BUFFER];
   bool            bust_prompt;
