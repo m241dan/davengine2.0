@@ -33,6 +33,7 @@
 #define eBOLD   1
 
 /* A few globals */
+#define OUT_BUFS	   5
 #define MAX_BUFFER         4096                   /* seems like a decent amount         */
 #define MAX_OUTPUT         2048                   /* well shoot me if it isn't enough   */
 #define MAX_HELP_ENTRY     4096                   /* roughly 40 lines of blocktext      */
@@ -123,7 +124,7 @@ struct dSocket
   LLIST         * events;
   char          * hostname;
   char          * inbuf;
-  char            outbuf[MAX_OUTPUT];
+  D_BUFFER	* outbuf[OUT_BUFS];
   char            next_command[MAX_BUFFER];
   bool            bust_prompt;
   sh_int          lookup_status;
@@ -234,6 +235,7 @@ extern const unsigned char compress_will2[];
 
 char  *crypt                  ( const char *key, const char *salt );
 
+#define text_to_buffer( dsock, txt ) __text_to_buffer( (dsock), (txt), 0 )
 /*
  * socket.c
  */
@@ -242,7 +244,7 @@ bool  new_socket              ( int sock );
 void  close_socket            ( D_S *dsock, bool reconnect );
 bool  read_from_socket        ( D_S *dsock );
 bool  text_to_socket          ( D_S *dsock, const char *txt );  /* sends the output directly */
-void  text_to_buffer          ( D_S *dsock, const char *txt );  /* buffers the output        */
+void  __text_to_buffer          ( D_S *dsock, const char *txt, int buffer );  /* buffers the output        */
 void  text_to_mobile          ( D_M *dMob, const char *txt );   /* buffers the output        */
 void  next_cmd_from_buffer    ( D_S *dsock );
 bool  flush_output            ( D_S *dsock );
@@ -281,6 +283,7 @@ int	find_real_length      ( const char *str, int goal );
 char   *copy_string_fl	      ( const char *orig, int length );
 char   *create_pattern	      ( const char *pattern, int width );
 int	mudcat		      ( char *dst, const char *cat ); /* for use with managed strings only */
+int	reset_string	      ( char *string );
 /*
  * help.c
  */

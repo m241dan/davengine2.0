@@ -244,3 +244,18 @@ int mudcat( char *dst, const char *cat )
    strcat( dst, cat );
    return strlen( dst );
 }
+
+int reset_string( char *string )
+{
+   MEM_BUCKET *bucket;
+
+   if( ( bucket = get_bucket_for( string ) ) == NULL )
+   {
+      bug( "%s: attempting to reset a non-managed string: %s", __FUNCTION__, string );
+      return 0;
+   }
+
+   memset( string, 0, bucket->mem_size );
+   return 1;
+}
+

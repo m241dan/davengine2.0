@@ -140,3 +140,10 @@ void mudcat_test( void )
    for( x = 0; x < 4; x++ )
       printf( "String %d is '%s'\r\n", x+1, strings[x] );
 }
+
+void mudcat_test_simple( void )
+{
+   char *string = new_string( "This is a string.\r\n" );
+   mudcat( string, "This is a non-reallocated string.\r\n" );
+   printf( "Result -\r\n%s", string );
+}

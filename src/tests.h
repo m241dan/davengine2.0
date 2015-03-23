@@ -8,3 +8,4 @@ void buffer_basics_test		( void );
 void buffer_basics_test2	( void );
 void lua_chunk_test		( void );
 void mudcat_test		( void );
+void mudcat_test_simple		( void );

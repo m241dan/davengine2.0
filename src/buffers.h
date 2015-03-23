@@ -22,9 +22,13 @@ struct mud_buffer
       bug( "%s: could not create a buffer", __FUNCTION__ );	\
 }
 
+/* setters */
+int		 set_buffer_length	( D_BUFFER *buf, int new_length );
+
 /* utility */
 int	  	 parse_into_buffer	( D_BUFFER *buf, char *input );
 int		 set_favor		( D_BUFFER *buf, BUFFER_FAVOR favor );
 char 		*buffer_to_string	( D_BUFFER *buf );
 char		*buffers_to_string	( D_BUFFER *buffers[], int size );
 int		 get_buffer_length	( D_BUFFER *buf );
+int		 clear_buffer		( D_BUFFER *buf );

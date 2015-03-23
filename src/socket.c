@@ -35,7 +35,7 @@ char 	   *DB_ADDR 		= NULL;
 char 	   *DB_LOGIN 		= NULL;
 char       *DB_PASSWORD 	= NULL;
 
-bool run_tests = TRUE;
+bool run_tests = FALSE;
 
 /* api handles */
 lua_State *lua_handle 	= NULL;
@@ -79,8 +79,9 @@ int main(int argc, char **argv)
       copy_string_fl_test();
       buffer_basics_test();
       buffer_basics_test2();
-      lua_chunk_test(); */
-      mudcat_test();
+      lua_chunk_test();
+      mudcat_test(); */
+      mudcat_test_simple();
    }
 
    /* note that we are booting up */
@@ -580,9 +581,9 @@ bool text_to_socket(D_SOCKET *dsock, const char *txt)
  *
  * Will also parse ANSI colors and other tags.
  */
-void text_to_buffer(D_SOCKET *dsock, const char *txt)
+void __text_to_buffer(D_SOCKET *dsock, const char *txt, int buffer )
 {
-  static char output[8 * MAX_BUFFER];
+  char *output = str_alloc( MAX_BUFFER * 8 );
   bool underline = FALSE, bold = FALSE;
   int iPtr = 0, last = -1, j, k;
   int length = strlen(txt);
@@ -769,7 +770,7 @@ void text_to_buffer(D_SOCKET *dsock, const char *txt)
           else
             txt++;
         }
-        break;   
+        break;
     }
   }
 
@@ -789,7 +790,8 @@ void text_to_buffer(D_SOCKET *dsock, const char *txt)
   }
 
   /* add data to buffer */
-  strcpy(dsock->outbuf + dsock->top_output, output);
+   mudcat( dsock->outbuf, output );
+/*  strcpy(dsock->outbuf + dsock->top_output, output); */
   dsock->top_output += iPtr;
 }
 
@@ -907,6 +909,7 @@ bool flush_output(D_SOCKET *dsock)
   if (!text_to_socket(dsock, dsock->outbuf))
     return FALSE;
 
+   reset_string( dsock->outbuf );
   /* Success */
   return TRUE;
 }
@@ -1094,6 +1097,9 @@ void clear_socket(D_SOCKET *sock_new, int sock)
   sock_new->top_output     =  0;
   sock_new->events         =  AllocList();
    assign( sock_new->inbuf, str_alloc( MAX_BUFFER ) );
+   assign( sock_new->outbuf[0], new_buffer( 80 ) );
+   for( int x = 1; x < OUT_BUFS; x++ )
+      assign( sock_new->outbuf[x], new_buffer( 3 ) );
 }
 
 /* does the lookup, changes the hostname, and dies */
