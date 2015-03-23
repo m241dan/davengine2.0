@@ -4,6 +4,23 @@
 #include <string.h>
 #include "mud.h"
 
+/* setters */
+int set_buffer_width( D_BUFFER *buf, int width )
+{
+   char *buffer_contents;
+
+   if( SizeOfList( buf->lines ) < 1 )
+   {
+      buf->width = width;
+      return 1;
+   }
+
+   buffer_contents = buffer_to_string( buf );
+   buf->width = width;
+   clear_buffer( buf );
+   parse_into_buffer( buf, buffer_contents );
+   return 1;
+}
 
 /* utility */
 int parse_into_buffer( D_BUFFER *buf, char *input )

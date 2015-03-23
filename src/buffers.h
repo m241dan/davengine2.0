@@ -23,7 +23,7 @@ struct mud_buffer
 }
 
 /* setters */
-int		 set_buffer_length	( D_BUFFER *buf, int new_length );
+int 		 set_buffer_width	( D_BUFFER *buf, int width );
 
 /* utility */
 int	  	 parse_into_buffer	( D_BUFFER *buf, char *input );
