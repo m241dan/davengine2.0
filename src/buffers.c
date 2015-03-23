@@ -11,6 +11,9 @@ int parse_into_buffer( D_BUFFER *buf, char *input )
    int real, x;
    bool newline, space;
 
+   if( buf->width < 1 )
+      return 0;
+
    while( *input != '\0' )
    {
       newline = FALSE;

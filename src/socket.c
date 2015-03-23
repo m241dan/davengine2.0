@@ -1090,9 +1090,9 @@ void clear_socket(D_SOCKET *sock_new, int sock)
   sock_new->top_output     =  0;
   sock_new->events         =  AllocList();
    assign( sock_new->inbuf, str_alloc( MAX_BUFFER ) );
-   assign( sock_new->outbuf[0], new_buffer( 80 ) );
+   assign( sock_new->outbuf[0], new_buffer( 70 ) );
    for( int x = 1; x < OUT_BUFS; x++ )
-      assign( sock_new->outbuf[x], new_buffer( 3 ) );
+      assign( sock_new->outbuf[x], new_buffer( 0 ) );
 }
 
 /* does the lookup, changes the hostname, and dies */
