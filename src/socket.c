@@ -626,14 +626,6 @@ void __text_to_buffer(D_SOCKET *dsock, const char *txt, int buffer )
     return;
   }
 
-  /* always start with a leading space */
-  if (dsock->top_output == 0)
-  {
-    dsock->outbuf[0] = '\n';
-    dsock->outbuf[1] = '\r';
-    dsock->top_output = 2;
-  }
-
   while (*txt != '\0')
   {
     /* simple bound checking */
@@ -790,7 +782,7 @@ void __text_to_buffer(D_SOCKET *dsock, const char *txt, int buffer )
   }
 
   /* add data to buffer */
-   mudcat( dsock->outbuf, output );
+   parse_into_buffer( dsock->outbuf[buffer], output );
 /*  strcpy(dsock->outbuf + dsock->top_output, output); */
   dsock->top_output += iPtr;
 }
@@ -906,10 +898,11 @@ bool flush_output(D_SOCKET *dsock)
    * Send the buffer, and return FALSE
    * if the write fails.
    */
-  if (!text_to_socket(dsock, dsock->outbuf))
+  if (!text_to_socket(dsock, buffers_to_string( dsock->outbuf, OUT_BUFS ) ) )
     return FALSE;
 
-   reset_string( dsock->outbuf );
+   for( int x = 0; x < OUT_BUFS; x++ )
+      clear_buffer( dsock->outbuf[x] );
   /* Success */
   return TRUE;
 }

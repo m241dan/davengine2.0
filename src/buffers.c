@@ -116,11 +116,6 @@ char *buffers_to_string( D_BUFFER *buffers[], int size )
    }
    string = str_alloc( ( ( ( width + 2 ) * max_lines ) * STRING_PADDING ) );
    /* iterate through and create the string */
-   printf( "%s: max_lines %d\r\n", __FUNCTION__, max_lines );
-   for( x = 0; x < size; x++ )
-   {
-      printf( "%s: buffer %d lines %d print_start %d\r\n", __FUNCTION__, x, SizeOfList( buffers[x]->lines ), print_start[x] );
-   }
    for( y = 0; y < max_lines; y++ )
    {
       for( x = 0; x < size; x++ )
@@ -159,4 +154,15 @@ int get_buffer_length( D_BUFFER *buf )
       length += strlen( line );
    DetachIterator( &Iter );
    return length;
+}
+
+int clear_buffer( D_BUFFER *buf )
+{
+   char *line;
+   ITERATOR Iter;
+   AttachIterator( &Iter, buf->lines );
+   while( ( line = (char *)NextInList( &Iter ) ) != NULL )
+      DetachFromList( line, buf->lines );
+   DetachIterator( &Iter );
+   return 1;
 }
