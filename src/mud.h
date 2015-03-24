@@ -109,13 +109,15 @@ typedef  short int         sh_int;
  ******************************/
 
 /* type defintions */
-typedef struct  dSocket       D_SOCKET;
-typedef struct  dMobile       D_MOBILE;
-typedef struct  help_data     HELP_DATA;
-typedef struct  lookup_data   LOOKUP_DATA;
-typedef struct  event_data    EVENT_DATA;
-typedef struct  lua_var_chunk LUA_CHUNK;
-typedef struct  lua_var	      LUA_VAR;
+typedef struct  dSocket		D_SOCKET;
+typedef struct  dMobile 	D_MOBILE;
+typedef struct  help_data     	HELP_DATA;
+typedef struct  lookup_data   	LOOKUP_DATA;
+typedef struct  event_data    	EVENT_DATA;
+typedef struct  lua_var_chunk 	LUA_CHUNK;
+typedef struct  lua_var	      	LUA_VAR;
+typedef struct  id_handler	ID_HANDLER;
+typedef struct  id_tag		ID_TAG;
 
 /* the actual structures */
 struct dSocket
@@ -179,6 +181,7 @@ typedef struct buffer_type
 #include "lua_utils.h"
 #include "sqldb.h"
 #include "lua_var.h"
+#include "id-handler.h"
 
 /* tests.h should be last */
 #include "tests.h"
